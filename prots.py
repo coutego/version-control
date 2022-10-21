@@ -4,6 +4,10 @@
 
 from typing import Protocol
 
+# FIXME: move these to the files with implementations
+import os
+import os.path
+
 
 class PDB(Protocol):
     """Interactions with the underlying DB."""
@@ -33,8 +37,14 @@ class DB(PDB):
         root = self.__find_dir()
         d = key[0:2]  # FIXME Check length of key and raise an error if needed
         fname = key[2:]
-        lfname = root + "/" + d + "/" + fname
-        print("The file '{}' has been saved.", lfname)
+        ldirs = root + "/objects/" + d
+        lfname = ldirs + "/" + fname
+        if os.path.exists(lfname):
+            return
+        os.makedirs(ldirs)
+        with open(lfname, "wb") as f:
+            print("Saving new file '{}".format(lfname))
+            f.write(bb)
 
     def get(self, key: str) -> bytes:
         """Get the contents associated with a key, returning them or None."""
@@ -45,10 +55,9 @@ class DB(PDB):
 
         The current implementation only searches in the current dir.
         """
-        return "."
+        return "./.pasvc"
 
 
-##### FIXME: delete
-
+# FIXME: delete
 db = DB()
 db.put("abcd", bytes("jarl!", "UTF-8"))
