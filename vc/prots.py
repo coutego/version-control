@@ -2,7 +2,7 @@
 
 """Protocols for the different components of the VC."""
 
-from typing import Protocol
+from typing import Protocol, List
 
 
 class PDB(Protocol):
@@ -22,4 +22,17 @@ class PHasher(Protocol):
 
     def hash(self, bb: bytes) -> str:
         """Calculate the hash for the given bytes."""
+        ...
+
+
+class PCommandProcessor(Protocol):
+    """Protocol implemented by the different commands."""
+
+    @property
+    def key(self) -> str:
+        """Return the key of this command."""
+        ...
+
+    def process_command(self, args: List[str]) -> None:
+        """Process the command with the given args."""
         ...

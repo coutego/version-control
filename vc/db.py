@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+
+"""DB related functionality."""
+import os
+import os.path
+from typing import Tuple
+
+from vc.prots import PDB
+
+VC_DIR = ".vc"
+
+
+class DB(PDB):
+    """Default implementation of the IPDB protocol."""
+
+    def put(self, key: str, bb: bytes) -> None:
+        """Associate the content bb to the key."""
+        (lfname, ldirs, fname) = self._filename_from_key(key)
+        if os.path.exists(lfname):
+            return
+        os.makedirs(ldirs, exist_ok=True)
+        with open(lfname, "wb") as f:
+            print("Saving new file '{}".format(lfname))
+            f.write(bb)
+
+    def get(self, key: str) -> bytes:
+        """Get the contents associated with a key, returning them or None."""
+        pass
+
+    def __find_dir(self) -> str:
+        """Find the root dir of the VCS.
+
+        The current implementation only searches in the current dir.
+        """
+        return self._find_vc_dir()
+
+    def _filename_from_key(self, key: str) -> Tuple[str, str, str]:
+        root = self.__find_dir()
+        if root is None:
+            raise FileNotFoundError("Not in a repo")
+        if not (isinstance(key, str)) or len(key) < 4:
+            raise Exception("Incorrect key")
+        d = key[0:2]
+        fname = key[2:]
+        ldirs = root + "/objects/" + d
+        lfname = ldirs + "/" + fname
+        return (lfname, ldirs, fname)
+
+    def _find_vc_dir(self, startdir=os.curdir):
+        curr = startdir
+        prev = None
+
+        while True:
+            if prev and os.path.realpath(curr) == os.path.realpath(prev):
+                return None
+            d = curr + "/" + VC_DIR
+            if os.path.isdir(d):
+                return d
+            prev = curr
+            curr = prev + "/.."
