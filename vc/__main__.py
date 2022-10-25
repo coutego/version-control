@@ -5,8 +5,9 @@
 import sys
 from typing import List
 
-from vc.command_hash_object import HashObjectCommand
 from vc.prots import PCommandProcessor
+from vc.command_hash_object import HashObjectCommand
+from vc.impl.db import DB
 
 
 class MainCommandProcessor(PCommandProcessor):
@@ -16,14 +17,22 @@ class MainCommandProcessor(PCommandProcessor):
     key = ""
 
     def __init__(self):
-        """Constructor."""
-        self.processors.append(HashObjectCommand())
+        """Build the object tree."""
+        db = DB()
+        self.processors.append(HashObjectCommand(db))
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
-        cmd = args[1]
+        if len(args) < 2:
+            commands = ""
+            for p in self.processors:
+                if len(commands) > 0:
+                    commands = commands + ", "
+                commands = commands + p.key
+            raise Exception("No command especified. Available commands: " + commands)
         iargs = args[2:]
 
+        cmd = args[1]
         for p in self.processors:
             if p.key == cmd:
                 return p.process_command(iargs)

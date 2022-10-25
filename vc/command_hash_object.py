@@ -7,23 +7,22 @@ import hashlib
 import sys
 from typing import List
 
-from vc.db import DB
-from vc.prots import PCommandProcessor
+from vc.prots import PCommandProcessor, PDB
 
 
 class HashObjectCommand(PCommandProcessor):
     """Implementation of the hash-object command."""
 
     key = "hash-object"
-    db = DB()
 
-    def __init__(self):
+    def __init__(self, db: PDB):
         """Initialize object, preparing the parser."""
         parser = argparse.ArgumentParser()
         parser.add_argument("-w", action="store_true")
         parser.add_argument("--stdin", action="store_true")
         parser.add_argument("file", type=str)
         self.parser = parser
+        self.db = db
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""

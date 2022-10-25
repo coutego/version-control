@@ -46,7 +46,8 @@ class DB(PDB):
         lfname = ldirs + "/" + fname
         return (lfname, ldirs, fname)
 
-    def _find_vc_dir(self, startdir=os.curdir):
+    @staticmethod
+    def _find_vc_dir(startdir=os.curdir):
         curr = startdir
         prev = None
 
