@@ -38,6 +38,15 @@ class DB(PDB):
             contents = f.read()
             return DBObject("blob", len(contents), contents)  # FIXME blob is hardcoded
 
+    def init(self) -> None:
+        """Create and initialize the DB."""
+        if os.path.exists(VC_DIR):
+            return
+        os.mkdir(VC_DIR)
+        os.mkdir(VC_DIR + "/objects")
+        d = os.path.realpath(os.path.curdir) + "/" + VC_DIR
+        print(f"Initialized empty VC repository in {d}")
+
     def __find_dir(self) -> str:
         """Find the root dir of the VCS.
 

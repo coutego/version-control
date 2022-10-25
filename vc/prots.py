@@ -11,6 +11,10 @@ DBObject = NamedTuple("DBObject", [("type", str), ("size", int), ("contents", by
 class PDB(Protocol):
     """Interactions with the underlying DB."""
 
+    def init(self) -> None:
+        """Create and initialize the DB."""
+        ...
+
     def put(self, key: str, bb: bytes) -> None:
         """Associate the content bb to the key."""
         ...
