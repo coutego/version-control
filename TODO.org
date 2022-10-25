@@ -1,0 +1,18 @@
+#+title: Todo
+
+* TODO Make DB to use the hasher through a protocol instead of hardcoding it
+
+* TODO Implement file-cat
+
+* TODO Implement init
+- Create the empty structure
+
+* TODO Implement add [/]
+- [ ] Decide how to implement the index / stage area
+
+* TODO Implement remove
+- vc restore --staged <file-name>
+
+* TODO Implement commit
+- [ ] Without files (?)
+- [ ] With a single file
