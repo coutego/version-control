@@ -24,6 +24,10 @@ class PHasher(Protocol):
         """Calculate the hash for the given bytes."""
         ...
 
+    def valid_hash(self, hsh: str) -> bool:
+        """Return True if hsh is a valid hash, False otherwise."""
+        ...
+
 
 class PCommandProcessor(Protocol):
     """Protocol implemented by the different commands."""
