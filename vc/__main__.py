@@ -29,7 +29,8 @@ class MainCommandProcessor(PCommandProcessor):
                 if len(commands) > 0:
                     commands = commands + ", "
                 commands = commands + p.key
-            raise Exception("No command especified. Available commands: " + commands)
+            print("No command especified. Available commands: " + commands)
+            return None
         iargs = args[2:]
 
         cmd = args[1]
