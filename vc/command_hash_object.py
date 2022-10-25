@@ -20,7 +20,7 @@ class HashObjectCommand(PCommandProcessor):
         parser = argparse.ArgumentParser()
         parser.add_argument("-w", action="store_true")
         parser.add_argument("--stdin", action="store_true")
-        parser.add_argument("file", type=str)
+        parser.add_argument("file", type=str, nargs="?")
         self.parser = parser
         self.db = db
 
@@ -36,6 +36,10 @@ class HashObjectCommand(PCommandProcessor):
             for line in lines:
                 content = content + bytes(line, "UTF-8")
         else:
+            if r.file is None:
+                raise FileNotFoundError(
+                    "Filename not specified and --stdin option not indicated."
+                )
             with open(fil, "rb") as f:
                 content = f.read()
 
