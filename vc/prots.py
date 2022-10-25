@@ -2,7 +2,10 @@
 
 """Protocols for the different components of the VC."""
 
-from typing import Protocol, List
+from typing import Protocol, List, NamedTuple, Optional
+
+
+DBObject = NamedTuple("DBObject", [("type", str), ("size", int), ("contents", bytes)])
 
 
 class PDB(Protocol):
@@ -12,9 +15,13 @@ class PDB(Protocol):
         """Associate the content bb to the key."""
         ...
 
-    def get(self, key: str) -> bytes:
+    def get(self, key: str) -> Optional[DBObject]:
         """Get the contents associated with a key, returning them or None."""
         ...
+
+
+class PDBObject(Protocol):
+    """Object in the DB."""
 
 
 class PHasher(Protocol):

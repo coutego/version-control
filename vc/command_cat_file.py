@@ -2,8 +2,6 @@
 
 """cat-file command."""
 import argparse
-import hashlib
-import sys
 from typing import List
 
 from vc.prots import PCommandProcessor, PDB
@@ -13,6 +11,7 @@ class CatFileCommand(PCommandProcessor):
     """Implementation of the cat-file command."""
 
     key = "cat-file"
+    db: PDB
 
     def __init__(self, db: PDB):
         """Initialize object, preparing the parser."""
@@ -32,5 +31,20 @@ class CatFileCommand(PCommandProcessor):
         hsh = r.hash
         ob = self.db.get(hsh)
 
-        if r.type:
-            return ob.type
+        if r.e:
+            if ob:
+                return
+            else:
+                print("Object doesn't exist")  # FIXME Check spec
+                return
+
+        if ob is None:
+            print(f"fatal: Not a valid object name {hsh}")
+            return
+
+        if r.p:
+            print("{}".format(ob.contents.decode("UTF-8")))
+        elif r.t:
+            print(ob.type)
+        elif r.s:
+            print(ob.size)

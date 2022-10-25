@@ -3,9 +3,11 @@
 """DB related functionality."""
 import os
 import os.path
-from typing import Tuple
+import glob
 
-from vc.prots import PDB
+from typing import Tuple, Optional
+
+from vc.prots import PDB, DBObject
 
 VC_DIR = ".vc"
 
@@ -15,7 +17,7 @@ class DB(PDB):
 
     def put(self, key: str, bb: bytes) -> None:
         """Associate the content bb to the key."""
-        (lfname, ldirs, fname) = self._filename_from_key(key)
+        lfname, ldirs, fname = self._filename_from_key(key)
         if os.path.exists(lfname):
             return
         os.makedirs(ldirs, exist_ok=True)
@@ -23,16 +25,25 @@ class DB(PDB):
             print("Saving new file '{}".format(lfname))
             f.write(bb)
 
-    def get(self, key: str) -> bytes:
+    def get(self, key: str) -> Optional[DBObject]:
         """Get the contents associated with a key, returning them or None."""
-        pass
+        lfname, ldirs, fname = self._filename_from_key(key)
+
+        files = glob.glob(lfname + "*")
+
+        if len(files) != 1:
+            return None
+
+        with open(files[0], "rb") as f:
+            contents = f.read()
+            return DBObject("blob", len(contents), contents)  # FIXME blob is hardcoded
 
     def __find_dir(self) -> str:
         """Find the root dir of the VCS.
 
         The current implementation only searches in the current dir.
         """
-        return self._find_vc_dir()
+        return _find_vc_dir()
 
     def _filename_from_key(self, key: str) -> Tuple[str, str, str]:
         root = self.__find_dir()
@@ -46,16 +57,16 @@ class DB(PDB):
         lfname = ldirs + "/" + fname
         return (lfname, ldirs, fname)
 
-    @staticmethod
-    def _find_vc_dir(startdir=os.curdir):
-        curr = startdir
-        prev = None
 
-        while True:
-            if prev and os.path.realpath(curr) == os.path.realpath(prev):
-                return None
-            d = curr + "/" + VC_DIR
-            if os.path.isdir(d):
-                return d
-            prev = curr
-            curr = prev + "/.."
+def _find_vc_dir(startdir=os.curdir):
+    curr = startdir
+    prev = None
+
+    while True:
+        if prev and os.path.realpath(curr) == os.path.realpath(prev):
+            return None
+        d = curr + "/" + VC_DIR
+        if os.path.isdir(d):
+            return d
+        prev = curr
+        curr = prev + "/.."

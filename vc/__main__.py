@@ -7,6 +7,7 @@ from typing import List
 
 from vc.prots import PCommandProcessor
 from vc.command_hash_object import HashObjectCommand
+from vc.command_cat_file import CatFileCommand
 from vc.impl.db import DB
 
 
@@ -20,6 +21,7 @@ class MainCommandProcessor(PCommandProcessor):
         """Build the object tree."""
         db = DB()
         self.processors.append(HashObjectCommand(db))
+        self.processors.append(CatFileCommand(db))
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
