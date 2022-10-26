@@ -45,6 +45,6 @@ class CatFileCommand(PCommandProcessor):
         if r.p:
             print("{}".format(ob.contents.decode("UTF-8")))
         elif r.t:
-            print(ob.type)
+            print(ob.type.name)
         elif r.s:
             print(ob.size)

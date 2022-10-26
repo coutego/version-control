@@ -35,8 +35,7 @@ class DB(PObjectDB):
         os.makedirs(ldirs, exist_ok=True)
 
         with open(lfname, "wb") as f:
-            s = typ.lower()
-            s = f"{s} {len(bb)}\0"
+            s = f"{typ.name.lower()} {len(bb)}\0"
             f.write(s.encode("UTF-8") + bb)
             return key
 
@@ -53,10 +52,10 @@ class DB(PObjectDB):
             contents = f.read()
             idx_typ = contents.index(b" ")
             idx_len = contents.index(0)
-            typ = contents[0:idx_typ].decode("UTF-8").upper()
+            typ = contents[0:idx_typ].decode("UTF-8")
             length = contents[idx_typ:idx_len].decode("UTF-8")
             contents = contents[idx_len + 1 :]
-            return DBObject(typ, int(length), contents)
+            return DBObject(DBObjectType(typ), int(length), contents)
 
     def init(self) -> None:
         """Create and initialize the DB."""
