@@ -3,7 +3,6 @@
 """hash-object command."""
 
 import argparse
-import hashlib
 import sys
 from typing import List
 
@@ -43,7 +42,7 @@ class HashObjectCommand(PCommandProcessor):
             with open(fil, "rb") as f:
                 content = f.read()
 
-        hs = hashlib.sha1(content).hexdigest()
         if r.w:
-            self.db.put(hs, content)
-        print(hs)
+            print(self.db.put(content))
+        else:
+            print(self.db.calculate_key(content))

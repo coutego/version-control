@@ -10,6 +10,7 @@ from vc.command_hash_object import HashObjectCommand
 from vc.command_cat_file import CatFileCommand
 from vc.command_init import InitCommand
 from vc.impl.db import DB
+from vc.impl.sha1hasher import SHA1Hasher
 
 
 class MainCommandProcessor(PCommandProcessor):
@@ -20,7 +21,7 @@ class MainCommandProcessor(PCommandProcessor):
 
     def __init__(self):
         """Build the object tree."""
-        db = DB()
+        db = DB(SHA1Hasher())
         self.processors.append(HashObjectCommand(db))
         self.processors.append(CatFileCommand(db))
         self.processors.append(InitCommand(db))
@@ -35,12 +36,14 @@ class MainCommandProcessor(PCommandProcessor):
                 commands = commands + p.key
             print("No command especified. Available commands: " + commands)
             return None
-        iargs = args[2:]
 
+        iargs = args[2:]
         cmd = args[1]
+
         for p in self.processors:
             if p.key == cmd:
                 return p.process_command(iargs)
+        print(f"Internal error: {cmd} command not found", file=sys.stderr)
 
 
 if __name__ == "__main__":

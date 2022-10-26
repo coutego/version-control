@@ -7,7 +7,7 @@ import glob
 
 from typing import Tuple, Optional
 
-from vc.prots import PObjectDB, DBObject, DBObjectType
+from vc.prots import PObjectDB, DBObject, DBObjectType, DBObjectKey, PHasher
 
 VC_DIR = ".vc"
 
@@ -15,15 +15,26 @@ VC_DIR = ".vc"
 class DB(PObjectDB):
     """Default implementation of the IPDB protocol."""
 
-    def put(self, key: str, bb: bytes, typ: DBObjectType) -> str:
+    hasher: PHasher
+
+    def __init__(self, hasher: PHasher):
+        """Configure the hasher to use in the DB."""
+        self.hasher = hasher
+
+    def calculate_key(self, bb: bytes):
+        """Calculate the key using the internal hasher."""
+        return self.hasher.hash(bb)
+
+    def put(self, bb: bytes, typ: DBObjectType = DBObjectType.BLOB) -> DBObjectKey:
         """Associate the content bb to the key."""
+        key = self.hasher.hash(bb)
         lfname, ldirs, fname = self._filename_from_key(key)
         if os.path.exists(lfname):
-            return
+            return key
+
         os.makedirs(ldirs, exist_ok=True)
 
         with open(lfname, "wb") as f:
-            print("Saving new file '{}".format(lfname))
             f.write(bb)
             return key
 
@@ -38,7 +49,9 @@ class DB(PObjectDB):
 
         with open(files[0], "rb") as f:
             contents = f.read()
-            return DBObject("blob", len(contents), contents)  # FIXME blob is hardcoded
+            return DBObject(
+                DBObjectType.BLOB, len(contents), contents
+            )  # FIXME blob is hardcoded
 
     def init(self) -> None:
         """Create and initialize the DB."""
