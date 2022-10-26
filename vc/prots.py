@@ -3,20 +3,29 @@
 """Protocols for the different components of the VC."""
 
 from typing import Protocol, List, NamedTuple, Optional
+from enum import Enum
 
 
 DBObject = NamedTuple("DBObject", [("type", str), ("size", int), ("contents", bytes)])
+DBObjectType = Enum("ObjectType", "BLOB TREE COMMIT TAG")
+DBObjectKey = str
 
 
-class PDB(Protocol):
+class PObjectDB(Protocol):
     """Interactions with the underlying DB."""
 
     def init(self) -> None:
         """Create and initialize the DB."""
         ...
 
-    def put(self, key: str, bb: bytes) -> None:
-        """Associate the content bb to the key."""
+    def put(
+        self, key: str, bb: bytes, typ: DBObjectType = DBObjectType.BLOB
+    ) -> DBObjectKey:
+        """Associate the content bb to the key.
+
+        Return the object key if succesful (either new entry created or
+        an existing one found).
+        """
         ...
 
     def get(self, key: str) -> Optional[DBObject]:

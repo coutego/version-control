@@ -7,23 +7,25 @@ import glob
 
 from typing import Tuple, Optional
 
-from vc.prots import PDB, DBObject
+from vc.prots import PObjectDB, DBObject, DBObjectType
 
 VC_DIR = ".vc"
 
 
-class DB(PDB):
+class DB(PObjectDB):
     """Default implementation of the IPDB protocol."""
 
-    def put(self, key: str, bb: bytes) -> None:
+    def put(self, key: str, bb: bytes, typ: DBObjectType) -> str:
         """Associate the content bb to the key."""
         lfname, ldirs, fname = self._filename_from_key(key)
         if os.path.exists(lfname):
             return
         os.makedirs(ldirs, exist_ok=True)
+
         with open(lfname, "wb") as f:
             print("Saving new file '{}".format(lfname))
             f.write(bb)
+            return key
 
     def get(self, key: str) -> Optional[DBObject]:
         """Get the contents associated with a key, returning them or None."""

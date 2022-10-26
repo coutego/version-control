@@ -3,16 +3,16 @@
 """init command."""
 from typing import List
 
-from vc.prots import PCommandProcessor, PDB
+from vc.prots import PCommandProcessor, PObjectDB
 
 
 class InitCommand(PCommandProcessor):
     """Implementation of the cat-file command."""
 
     key = "init"
-    db: PDB
+    db: PObjectDB
 
-    def __init__(self, db: PDB):
+    def __init__(self, db: PObjectDB):
         """Initialize object, preparing the parser."""
         self.db = db
 

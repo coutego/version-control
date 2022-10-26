@@ -4,16 +4,16 @@
 import argparse
 from typing import List
 
-from vc.prots import PCommandProcessor, PDB
+from vc.prots import PCommandProcessor, PObjectDB
 
 
 class CatFileCommand(PCommandProcessor):
     """Implementation of the cat-file command."""
 
     key = "cat-file"
-    db: PDB
+    db: PObjectDB
 
-    def __init__(self, db: PDB):
+    def __init__(self, db: PObjectDB):
         """Initialize object, preparing the parser."""
         parser = argparse.ArgumentParser()
         parser.add_argument("-e", action="store_true")
