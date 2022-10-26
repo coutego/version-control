@@ -2,6 +2,7 @@
 
 """cat-file command."""
 import argparse
+import sys
 from typing import List
 
 from vc.prots import PCommandProcessor, PObjectDB
@@ -35,11 +36,11 @@ class CatFileCommand(PCommandProcessor):
             if ob:
                 return
             else:
-                print("Object doesn't exist")  # FIXME Check spec
+                print("Object doesn't exist", file=sys.stderr)  # FIXME Check spec
                 return
 
         if ob is None:
-            print(f"fatal: Not a valid object name {hsh}")
+            print(f"fatal: Not a valid object name {hsh}", file=sys.stderr)
             return
 
         if r.p:

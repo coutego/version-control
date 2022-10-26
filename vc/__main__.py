@@ -34,7 +34,10 @@ class MainCommandProcessor(PCommandProcessor):
                 if len(commands) > 0:
                     commands = commands + ", "
                 commands = commands + p.key
-            print("No command especified. Available commands: " + commands)
+            print(
+                "No command especified. Available commands: " + commands,
+                file=sys.stderr,
+            )
             return None
 
         iargs = args[2:]
