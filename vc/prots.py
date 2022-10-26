@@ -15,6 +15,7 @@ class DBObjectType(Enum):
     TAG = "tag"
 
 
+# Transfer object for objects in the DB
 DBObject = NamedTuple(
     "DBObject", [("type", DBObjectType), ("size", int), ("contents", bytes)]
 )
@@ -22,7 +23,7 @@ DBObjectKey = str
 
 
 class PHasher(Protocol):
-    """Operations related to hash."""
+    """Responsible to calculate hashes to be used as DB keys."""
 
     def hash(self, bb: bytes) -> str:
         """Calculate the hash for the given bytes."""
@@ -57,12 +58,8 @@ class PObjectDB(Protocol):
         ...
 
 
-class PDBObject(Protocol):
-    """Object in the DB."""
-
-
 class PCommandProcessor(Protocol):
-    """Protocol implemented by the different commands."""
+    """Protocol implemented by the different (sub)commands."""
 
     @property
     def key(self) -> str:
