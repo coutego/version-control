@@ -25,7 +25,7 @@ class DB(PObjectDB):
         """Calculate the key using the internal hasher."""
         return self.hasher.hash(bb)
 
-    def put(self, bb: bytes, typ: DBObjectType = DBObjectType.BLOB) -> DBObjectKey:
+    def put(self, bb: bytes, typ: DBObjectType = "BLOB") -> DBObjectKey:
         """Associate the content bb to the key."""
         key = self.hasher.hash(bb)
         lfname, ldirs, fname = self._filename_from_key(key)
@@ -35,7 +35,9 @@ class DB(PObjectDB):
         os.makedirs(ldirs, exist_ok=True)
 
         with open(lfname, "wb") as f:
-            f.write(bb)
+            s = typ.lower()
+            s = f"{s} {len(bb)}\0"
+            f.write(s.encode("UTF-8") + bb)
             return key
 
     def get(self, key: str) -> Optional[DBObject]:
@@ -49,9 +51,12 @@ class DB(PObjectDB):
 
         with open(files[0], "rb") as f:
             contents = f.read()
-            return DBObject(
-                DBObjectType.BLOB, len(contents), contents
-            )  # FIXME blob is hardcoded
+            idx_typ = contents.index(b" ")
+            idx_len = contents.index(0)
+            typ = contents[0:idx_typ].decode("UTF-8").upper()
+            length = contents[idx_typ:idx_len].decode("UTF-8")
+            contents = contents[idx_len + 1 :]
+            return DBObject(typ, int(length), contents)
 
     def init(self) -> None:
         """Create and initialize the DB."""
