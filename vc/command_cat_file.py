@@ -16,11 +16,15 @@ class CatFileCommand(PCommandProcessor):
 
     def __init__(self, db: PObjectDB):
         """Initialize object, preparing the parser."""
-        parser = argparse.ArgumentParser()
-        parser.add_argument("-e", action="store_true")
-        parser.add_argument("-s", action="store_true")
-        parser.add_argument("-p", action="store_true")
-        parser.add_argument("-t", action="store_true")
+        parser = argparse.ArgumentParser(
+            description="Consult object DB.", add_help=True
+        )
+        parser.add_argument(
+            "-e", action="store_true", help="Check whether object exists"
+        )
+        parser.add_argument("-s", action="store_true", help="Print the object size")
+        parser.add_argument("-p", action="store_true", help="Print the object contents")
+        parser.add_argument("-t", action="store_true", help="Print the object type")
         parser.add_argument("hash", type=str)
         self.parser = parser
         self.db = db
@@ -49,3 +53,5 @@ class CatFileCommand(PCommandProcessor):
             print(ob.type.name)
         elif r.s:
             print(ob.size)
+        else:
+            self.parser.print_help(sys.stderr)

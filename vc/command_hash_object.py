@@ -16,10 +16,16 @@ class HashObjectCommand(PCommandProcessor):
 
     def __init__(self, db: PObjectDB):
         """Initialize object, preparing the parser."""
-        parser = argparse.ArgumentParser()
-        parser.add_argument("-w", action="store_true")
-        parser.add_argument("--stdin", action="store_true")
-        parser.add_argument("file", type=str, nargs="?")
+        parser = argparse.ArgumentParser(
+            description="Calculate hash and, optionally, write objects to DB"
+        )
+        parser.add_argument("-w", action="store_true", help="Write object to DB")
+        parser.add_argument(
+            "--stdin", action="store_true", help="Read objecdt contents from stdin"
+        )
+        parser.add_argument(
+            "file", type=str, nargs="?", help="name of the file to read from"
+        )
         self.parser = parser
         self.db = db
 
@@ -30,15 +36,17 @@ class HashObjectCommand(PCommandProcessor):
         fil = r.file
 
         if r.stdin:
+            if r.file:
+                self.parser.print_help(sys.stderr)
+                return
             lines = sys.stdin.readlines()
             content = b""
             for line in lines:
                 content = content + bytes(line, "UTF-8")
         else:
             if r.file is None:
-                raise FileNotFoundError(
-                    "Filename not specified and --stdin option not indicated."
-                )
+                self.parser.print_help(sys.stderr)
+                return
             with open(fil, "rb") as f:
                 content = f.read()
 
