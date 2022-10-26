@@ -40,7 +40,7 @@ class PObjectDB(Protocol):
         """Create and initialize the DB."""
         ...
 
-    def put(self, bb: bytes, typ: DBObjectType = DBObjectType("blob")) -> DBObjectKey:
+    def put(self, bb: bytes, typ: DBObjectType = DBObjectType.BLOB) -> DBObjectKey:
         """Associate the content bb to the key.
 
         Return the object key if succesful (either new entry created or

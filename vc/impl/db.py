@@ -25,7 +25,7 @@ class DB(PObjectDB):
         """Calculate the key using the internal hasher."""
         return self.hasher.hash(bb)
 
-    def put(self, bb: bytes, typ: DBObjectType = "BLOB") -> DBObjectKey:
+    def put(self, bb: bytes, typ: DBObjectType = DBObjectType.BLOB) -> DBObjectKey:
         """Associate the content bb to the key."""
         key = self.hasher.hash(bb)
         lfname, ldirs, fname = self._filename_from_key(key)
