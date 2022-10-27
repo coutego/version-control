@@ -32,15 +32,18 @@ class Index(PIndex):
         if not (os.path.isfile(fil_or_dir)):
             raise FileNotFoundError(f"Not a valid file '{fil_or_dir}'")
 
+        idx = _read_index_from_file(root + "/index")
+
         with open(fil_or_dir, "rb") as f:
             bb = f.read()
 
         key = self.db.put(bb)
-        self.entries[key] = (
+        idx[key] = (
             key,
             "f",
             os.path.relpath(fil_or_dir, root + "/.."),
         )
+        self.entries = idx
         _write_index_to_file(self.entries, root + "/index")
 
     def unstage_file(self, fil: str):
@@ -63,7 +66,7 @@ def _entry_to_str(e: PIndexEntry) -> str:
 
 
 def _str_to_entry(s: str) -> PIndexEntry:
-    return PIndexEntry(s[0:40], s[42], s[44:])
+    return PIndexEntry(s[0:40], s[41], s[43:])
 
 
 def _write_index_to_file(idx: Dict[str, PIndexEntry], fil: str):
@@ -72,16 +75,16 @@ def _write_index_to_file(idx: Dict[str, PIndexEntry], fil: str):
             f.write(_entry_to_str(it) + "\n")
 
 
-def _read_index_from_file(
-    idx: Dict[str, PIndexEntry], fil: str
-) -> Dict[str, PIndexEntry]:
+def _read_index_from_file(fil: str) -> Dict[str, PIndexEntry]:
+    try:
+        with open(fil, "r") as f:
+            content: str = f.read()
+            lines = content.splitlines()
 
-    with open(fil, "r") as f:
-        content: str = f.read()
-        entries = content.splitlines()
+            ret = {}
+            for s in lines:
+                ret[s[0:40]] = _str_to_entry(s)
 
-        ret = {}
-        for e in entries:
-            ret[e[0:40]] = PIndexEntry(e[0:40], e[42], e[44:])
-
-        return ret
+            return ret
+    except Exception:
+        return {}
