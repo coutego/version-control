@@ -3,18 +3,15 @@
 import os.path
 import json
 
-from typing import NamedTuple, Dict
-from vc.prots import PIndex, PObjectDB
-
-
-IndexEntry = NamedTuple("IndexEntry", [("key", str), ("type", str), ("name", str)])
+from typing import Dict
+from vc.prots import PIndex, PObjectDB, PIndexEntry
 
 
 class Index(PIndex):
     """Staging area (index)."""
 
     db: PObjectDB
-    entries: Dict[str, IndexEntry]
+    entries: Dict[str, PIndexEntry]
 
     def __init__(self, db: PObjectDB):
         """Initialize the object."""
@@ -27,6 +24,8 @@ class Index(PIndex):
         If the file has already been added, the entry is updated.
         If the file has not been added, add it.
         """
+        root = self.db.root_folder()
+
         if os.path.isdir(fil_or_dir):
             raise Exception("Directories are not supported yet.")
 
@@ -40,9 +39,9 @@ class Index(PIndex):
         self.entries[key] = (
             key,
             "f",
-            os.path.realpath(fil_or_dir),
-        )  # FIXME: remove vc root file from the path
-        _write_index_to_file(self.entries, self.db.root_folder() + "/index")
+            os.path.relpath(fil_or_dir, root + "/.."),
+        )
+        _write_index_to_file(self.entries, root + "/index")
 
     def unstage_file(self, fil: str):
         """Unstages the file, from the file, reverting it to the previous state."""
@@ -55,15 +54,34 @@ class Index(PIndex):
         if not (os.path.isfile(fil)):
             raise FileNotFoundError(f"Not a valid file '{fil}'")
 
-        del self.entries[os.path.realpath(fil)]  # FIXME make name canonical
+        del self.entries[os.path.relpath(fil, self.db.root_folder())]
         _write_index_to_file(self.entries, self.db.root_folder() + "/index")
 
 
-def _write_index_to_file(idx: Dict[str, IndexEntry], fil: str):
+def _entry_to_str(e: PIndexEntry) -> str:
+    return f"{e[0]} {e[1]} {e[2]}"
+
+
+def _str_to_entry(s: str) -> PIndexEntry:
+    return PIndexEntry(s[0:40], s[42], s[44:])
+
+
+def _write_index_to_file(idx: Dict[str, PIndexEntry], fil: str):
     with open(fil, "w") as f:
-        json.dump(list(idx.values()), f, indent=0)
+        for it in idx.values():
+            f.write(_entry_to_str(it) + "\n")
 
 
-def _read_index_from_file(idx: Dict[str, IndexEntry], fil: str):
+def _read_index_from_file(
+    idx: Dict[str, PIndexEntry], fil: str
+) -> Dict[str, PIndexEntry]:
+
     with open(fil, "r") as f:
-        json.load(f)
+        content: str = f.read()
+        entries = content.splitlines()
+
+        ret = {}
+        for e in entries:
+            ret[e[0:40]] = PIndexEntry(e[0:40], e[42], e[44:])
+
+        return ret

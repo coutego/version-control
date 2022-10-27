@@ -62,6 +62,9 @@ class PObjectDB(Protocol):
         ...
 
 
+PIndexEntry = NamedTuple("PIndexEntry", [("key", str), ("type", str), ("name", str)])
+
+
 class PIndex(Protocol):
     """Staging area (index)."""
 
