@@ -66,6 +66,10 @@ class DB(PObjectDB):
         d = os.path.realpath(os.path.curdir) + "/" + VC_DIR
         print(f"Initialized empty VC repository in {d}")
 
+    def root_folder(self) -> str:
+        """Return the root folder where this DB is located."""
+        return self.__find_dir()
+
     def __find_dir(self) -> str:
         """Find the root dir of the VCS.
 

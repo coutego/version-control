@@ -57,6 +57,28 @@ class PObjectDB(Protocol):
         """Get the contents associated with a key, returning them or None."""
         ...
 
+    def root_folder(self) -> str:
+        """Return the root folder where this DB is located."""
+        ...
+
+
+class PIndex(Protocol):
+    """Staging area (index)."""
+
+    def stage_file(self, fil_or_dir: str):
+        """Stage the given file or directory to the index file.
+
+        If the file has already been added, the entry is updated.
+        If the file has not been added, add it.
+        """
+        ...
+
+    def unstage_file(self, fil: str):
+        """Unstages the file, from the file, reverting it to the previous state."""
+
+    def remove_file(self, fil: str):
+        """Remove the file from the index, making it not tracked."""
+
 
 class PCommandProcessor(Protocol):
     """Protocol implemented by the different (sub)commands."""

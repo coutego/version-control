@@ -9,8 +9,10 @@ from vc.prots import PCommandProcessor
 from vc.command_hash_object import HashObjectCommand
 from vc.command_cat_file import CatFileCommand
 from vc.command_init import InitCommand
+from vc.command_add import AddCommand
 from vc.impl.db import DB
 from vc.impl.sha1hasher import SHA1Hasher
+from vc.impl.index import Index
 
 
 class MainCommandProcessor(PCommandProcessor):
@@ -22,9 +24,11 @@ class MainCommandProcessor(PCommandProcessor):
     def __init__(self):
         """Build the object tree."""
         db = DB(SHA1Hasher())
+        index = Index(db)
         self.processors.append(HashObjectCommand(db))
         self.processors.append(CatFileCommand(db))
         self.processors.append(InitCommand(db))
+        self.processors.append(AddCommand(db, index))
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
