@@ -78,9 +78,15 @@ class PIndex(Protocol):
 
     def unstage_file(self, fil: str):
         """Unstages the file, from the file, reverting it to the previous state."""
+        ...
 
     def remove_file(self, fil: str):
         """Remove the file from the index, making it not tracked."""
+        ...
+
+    def save_to_db(self) -> str:
+        """Save the Index to the DB, returning the key of the saved object."""
+        ...
 
 
 class PCommandProcessor(Protocol):
