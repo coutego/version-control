@@ -37,8 +37,10 @@ For the time being, there are only a handful of commands implemented,
 with very few options.
 The following already work:
 
-- vc init
-- vc add <files>
-- vc commit -m <msg>
-- vc hash-object [--stdin] [-w] <file>
-- vc cat-file [-e] [-p] [-t] <hash>
+#+begin_src sh
+$ vc init
+$ vc add <files>
+$ vc commit -m <msg>
+$ vc hash-object [--stdin] [-w] <file>
+$ vc cat-file [-e] [-p] [-t] <hash>
+#+end_src
