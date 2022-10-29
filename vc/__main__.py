@@ -3,8 +3,7 @@
 """Entry point to the vc module."""
 
 import sys
-from typing import List
-
+from typing import Dict, List
 from vc.prots import PCommandProcessor
 from vc.command_hash_object import HashObjectCommand
 from vc.command_cat_file import CatFileCommand
@@ -19,40 +18,42 @@ from vc.impl.index import Index
 class MainCommandProcessor(PCommandProcessor):
     """Main CommandProcessor."""
 
-    processors: List[PCommandProcessor] = []
+    processors: Dict[str, PCommandProcessor] = {}
     key = ""
 
     def __init__(self):
         """Build the object tree."""
         db = DB(SHA1Hasher())
         index = Index(db)
-        self.processors.append(HashObjectCommand(db))
-        self.processors.append(CatFileCommand(db))
-        self.processors.append(InitCommand(db))
-        self.processors.append(AddCommand(index))
-        self.processors.append(CommitCommand(index))
+        procs = []
+        procs.append(HashObjectCommand(db))
+        procs.append(CatFileCommand(db))
+        procs.append(InitCommand(db))
+        procs.append(AddCommand(index))
+        procs.append(CommitCommand(index))
+
+        for p in procs:
+            self.processors[p.key] = p
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
         if len(args) < 2:
-            commands = ""
-            for p in self.processors:
-                if len(commands) > 0:
-                    commands = commands + ", "
-                commands = commands + p.key
             print(
-                "No command especified. Available commands: " + commands,
+                f"Command required. Available commands: {', '.join(self.processors.keys())}",
                 file=sys.stderr,
             )
-            return None
+            exit(-1)
 
-        iargs = args[2:]
         cmd = args[1]
 
-        for p in self.processors:
-            if p.key == cmd:
-                return p.process_command(iargs)
-        print(f"Internal error: {cmd} command not found", file=sys.stderr)
+        if cmd not in self.processors.keys():
+            print(
+                f"Command '{cmd}' not implemented. Available commands: {', '.join(self.processors.keys())}",
+                file=sys.stderr,
+            )
+            exit(-1)
+
+        self.processors[cmd].process_command((args[2:]))
 
 
 if __name__ == "__main__":
