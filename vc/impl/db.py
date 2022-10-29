@@ -58,8 +58,11 @@ class DB(PObjectDB):
 
     def init(self) -> None:
         """Create and initialize the DB."""
-        if os.path.exists(VC_DIR):
+        root = _find_vc_dir()
+        if root:
+            print(f"Repository already exists at '{os.path.abspath(root)}'")
             return
+
         os.mkdir(VC_DIR)
         os.mkdir(VC_DIR + "/objects")
         d = os.path.realpath(os.path.curdir) + "/" + VC_DIR
