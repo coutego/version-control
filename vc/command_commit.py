@@ -1,15 +1,15 @@
-"""'add' command."""
+"""'commit' command."""
 
 import sys
 import argparse
 
 from typing import List
 
-from vc.prots import PCommandProcessor, PIndex
+from vc.prots import PCommandProcessor, PIndex, IndexStatus
 
 
 class CommitCommand(PCommandProcessor):
-    """Implementation of the add command."""
+    """Implementation of the 'commit' command."""
 
     key = "commit"
     index: PIndex

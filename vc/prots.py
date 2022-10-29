@@ -61,6 +61,15 @@ class PObjectDB(Protocol):
 
 
 PIndexEntry = NamedTuple("PIndexEntry", [("key", str), ("type", str), ("name", str)])
+IndexStatus = NamedTuple(
+    "IndexStatus",
+    [
+        ("branch", str),
+        ("not_tracked", List[str]),
+        ("not_staged", List[str]),
+        ("staged", List[str]),
+    ],
+)
 
 
 class PIndex(Protocol):
@@ -88,6 +97,10 @@ class PIndex(Protocol):
 
     def commit(self, message: str = None) -> str:
         """Commit this index, returning the hash of the commit."""
+        ...
+
+    def status(self) -> IndexStatus:
+        """Return the current status of the working area with respect to the index."""
         ...
 
 

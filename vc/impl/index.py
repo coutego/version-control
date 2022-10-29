@@ -2,8 +2,8 @@
 
 import os.path
 
-from typing import Dict, Optional, List
-from vc.prots import PIndex, PObjectDB, PIndexEntry, DBObjectType
+from typing import Dict, Optional, List, Set
+from vc.prots import PIndex, PObjectDB, PIndexEntry, DBObjectType, IndexStatus
 
 
 class Index(PIndex):
@@ -64,10 +64,7 @@ class Index(PIndex):
         raw_tree = _build_tree(entries)
 
         # Ensure all the intermediate dirs are in the tree
-        dirs = set("")
-        for d in set(raw_tree.keys()):
-            for c in _subdirs(d):
-                dirs.add(c)
+        dirs = _all_dirs_in_index(raw_tree)
 
         for d in dirs:
             if d not in raw_tree.keys():
@@ -84,6 +81,9 @@ class Index(PIndex):
 
     def commit(self, message: str = None) -> str:
         """Commit the current index, returning the commit hash."""
+        if message is None:
+            message = "<no commit message>"
+
         root = self.db.root_folder()
         head = root + "/HEAD"
 
@@ -99,6 +99,29 @@ class Index(PIndex):
             f.write(f"{nkey}\n")
 
         return nkey
+
+    def status(self) -> IndexStatus:
+        """Return the current status of the working area with respect to the index."""
+        entries = _read_index_from_file(self.root + "/index")
+        raw_tree = _build_tree(entries)
+        dirs = _all_dirs_in_index(raw_tree)
+
+        # FIXME: implement
+
+        branch = "<DETACHED>"  # FIXME
+        not_tracked: List[str] = []
+        not_staged: List[str] = []
+        staged: List[str] = []
+
+        return IndexStatus(branch, not_tracked, not_staged, staged)
+
+
+def _all_dirs_in_index(raw_tree: Dict[str, List[PIndexEntry]]) -> Set[str]:
+    dirs = set("")
+    for d in set(raw_tree.keys()):
+        for c in _subdirs(d):
+            dirs.add(c)
+    return dirs
 
 
 def _prepare_commit(tree: str, parent_hash: str, message: str) -> str:

@@ -10,6 +10,7 @@ from vc.command_cat_file import CatFileCommand
 from vc.command_init import InitCommand
 from vc.command_add import AddCommand
 from vc.command_commit import CommitCommand
+from vc.command_status import StatusCommand
 from vc.impl.db import DB
 from vc.impl.sha1hasher import SHA1Hasher
 from vc.impl.index import Index
@@ -31,6 +32,7 @@ class MainCommandProcessor(PCommandProcessor):
         procs.append(InitCommand(db))
         procs.append(AddCommand(index))
         procs.append(CommitCommand(index))
+        procs.append(StatusCommand(index))
 
         for p in procs:
             self.processors[p.key] = p
