@@ -14,9 +14,8 @@ class AddCommand(PCommandProcessor):
     key = "add"
     db: PObjectDB
 
-    def __init__(self, db: PObjectDB, index: PIndex):
+    def __init__(self, index: PIndex):
         """Initialize object, preparing the parser."""
-        self.db = db
         self.index = index
 
         parser = argparse.ArgumentParser()

@@ -28,7 +28,7 @@ class MainCommandProcessor(PCommandProcessor):
         self.processors.append(HashObjectCommand(db))
         self.processors.append(CatFileCommand(db))
         self.processors.append(InitCommand(db))
-        self.processors.append(AddCommand(db, index))
+        self.processors.append(AddCommand(index))
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
