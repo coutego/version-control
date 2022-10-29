@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-
-"""hash-object command."""
+"""'hash-object' command."""
 
 import argparse
 import sys

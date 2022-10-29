@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-
-"""init command."""
+"""'init' command."""
 from typing import List
 
 from vc.prots import PCommandProcessor, PObjectDB

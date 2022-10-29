@@ -1,6 +1,5 @@
-#!/usr/bin/env python3
+"""DB related functionality, exposed through the PDB protocol."""
 
-"""DB related functionality."""
 import os
 import os.path
 import glob
@@ -13,7 +12,7 @@ VC_DIR = ".vc"
 
 
 class DB(PObjectDB):
-    """Default implementation of the IPDB protocol."""
+    """Default implementation of the PDB protocol."""
 
     hasher: PHasher
 

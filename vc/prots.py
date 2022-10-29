@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """Protocols for the different components of the VC."""
 
 from typing import Protocol, List, Optional, NamedTuple
@@ -94,7 +92,7 @@ class PIndex(Protocol):
 
 
 class PCommandProcessor(Protocol):
-    """Protocol implemented by the different (sub)commands."""
+    """Protocol implemented by the (sub)commands."""
 
     @property
     def key(self) -> str:

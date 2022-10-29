@@ -5,15 +5,25 @@
 * DONE Implement file-cat
 
 * DONE Implement init
-- Create the empty structure
+- [X] Create the empty structure
 
 * DONE Implement add [1/1]
 - [X] Decide how to implement the index / stage area
 
+* TODO Implement 'log'
+- [ ] Only information as with option 'one-line'
+- [ ] Full information, no other option
+
 * TODO Implement 'status'
+- [ ] Implement with no options, no files specified
+- [ ] Implement with files specified
+
+* TODO Implement 'diff'
+- [ ] Implement with no options, no files specified
+- [ ] Implement with files specified
 
 * TODO Implement 'remove'
-- vc restore --staged <file-name>
+- [ ] vc restore --staged <file-name>
 
 * TODO Implement 'commit' [1/2]
 - [X] Without branches

@@ -1,10 +1,8 @@
-#!/usr/bin/env python3
+"""'cat-file' command."""
 
-"""cat-file command."""
 import argparse
 import sys
 from typing import List
-
 from vc.prots import PCommandProcessor, PObjectDB
 
 

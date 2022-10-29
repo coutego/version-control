@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+"""Hash related functionality."""
 
 import hashlib
 
