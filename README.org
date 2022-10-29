@@ -44,3 +44,30 @@ $ vc commit -m <msg>
 $ vc hash-object [--stdin] [-w] <file>
 $ vc cat-file [-e] [-p] [-t] <hash>
 #+end_src
+
+For the complete list you can just type vc, for the complete list of available commands
+or vc <command> -h, for information of the options supported by a given command.
+
+At the time of writing this README, this is the output for two cases.
+
+#+begin_src sh
+$ vc
+Command required. Available commands: hash-object, cat-file, init, add, commit
+
+$ vc hash-object -h
+usage: __main__.py [-h] [-w] [--stdin] [file]
+
+Calculate hash and, optionally, write objects to DB
+
+positional arguments:
+  file        name of the file to read from
+
+options:
+  -h, --help  show this help message and exit
+  -w          Write object to DB
+  --stdin     Read objecdt contents from stdin
+$
+#+end_src
+
+Otherwise, just use the source, Luke!
+Command <x> is implemented in vc/command_<x>.py.
