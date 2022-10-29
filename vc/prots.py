@@ -88,6 +88,10 @@ class PIndex(Protocol):
         """Save the Index to the DB, returning the key of the saved object."""
         ...
 
+    def commit(self, message: str = None) -> str:
+        """Commit this index, returning the hash of the commit."""
+        ...
+
 
 class PCommandProcessor(Protocol):
     """Protocol implemented by the different (sub)commands."""

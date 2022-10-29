@@ -10,14 +10,12 @@ class Index(PIndex):
     """Staging area (index)."""
 
     db: PObjectDB
-    entries: Dict[str, PIndexEntry]
+    root: str
 
     def __init__(self, db: PObjectDB):
         """Initialize the object."""
         self.db = db
-
-        root = db.root_folder()
-        self.entries = _read_index_from_file(root + "/index")
+        self.root = db.root_folder()
 
     def stage_file(self, fil_or_dir: str):
         """Stage the given file or directory to the index file.
@@ -25,7 +23,7 @@ class Index(PIndex):
         If the file has already been added, the entry is updated.
         If the file has not been added, add it.
         """
-        root = self.db.root_folder()
+        entries = _read_index_from_file(self.root + "/index")
 
         if os.path.isdir(fil_or_dir):
             raise Exception("Directories are not supported yet.")
@@ -37,33 +35,36 @@ class Index(PIndex):
             bb = f.read()
 
         key = self.db.put(bb)
-        self.entries[key] = PIndexEntry(
+        entries[key] = PIndexEntry(
             key,
             "f",
-            os.path.relpath(fil_or_dir, root + "/.."),
+            os.path.relpath(fil_or_dir, self.root + "/.."),
         )
-        _write_index_to_file(self.entries, root + "/index")
+        _write_index_to_file(entries, self.root + "/index")
 
     def unstage_file(self, fil: str):
         """Unstages the file, from the file, reverting it to the previous state."""
 
     def remove_file(self, fil: str):
         """Remove the file from the index, making it not tracked."""
+        entries = _read_index_from_file(self.root + "/index")
+
         if os.path.isdir(fil):
             raise Exception("Directories are not supported yet.")
 
         if not (os.path.isfile(fil)):
             raise FileNotFoundError(f"Not a valid file '{fil}'")
 
-        del self.entries[os.path.relpath(fil, self.db.root_folder())]
-        _write_index_to_file(self.entries, self.db.root_folder() + "/index")
+        del entries[os.path.relpath(fil, self.db.root_folder())]
+        _write_index_to_file(entries, self.db.root_folder() + "/index")
 
     def save_to_db(self) -> str:
         """Save the Index to the DB, returning the key of the saved object."""
-        raw_tree = _build_tree(self.entries)
+        entries = _read_index_from_file(self.root + "/index")
+        raw_tree = _build_tree(entries)
 
         # Ensure all the intermediate dirs are in the tree
-        dirs = set()
+        dirs = set("")
         for d in set(raw_tree.keys()):
             for c in _subdirs(d):
                 dirs.add(c)
@@ -80,6 +81,38 @@ class Index(PIndex):
             pn.append(PIndexEntry("", "d", d))
 
         return _save_to_db_node("", raw_tree, self.db)
+
+    def commit(self, message: str = None) -> str:
+        """Commit the current index, returning the commit hash."""
+        root = self.db.root_folder()
+        head = root + "/HEAD"
+
+        parent = ""
+        if os.path.exists(head):
+            with open(head, "r") as f:
+                parent = f.read()
+
+        commit = _prepare_commit(self.save_to_db(), parent, message)
+        nkey = self.db.put(commit.encode("UTF-8"))
+
+        with open(head, "w") as f:
+            f.write(f"{nkey}\n")
+
+        return nkey
+
+
+def _prepare_commit(tree: str, parent_hash: str, message: str) -> str:
+    ret = f"tree {tree}\n"
+
+    if parent_hash and parent_hash.strip() != "":
+        ret = ret + f"parent {parent_hash}\n"
+
+    # ret = ret + "author\n"
+    # ret = ret + "committer\n"
+    ret = ret + "\n"
+    ret = ret + f"{message}\n"
+
+    return ret
 
 
 def _save_to_db_node(d: str, tree: Dict[str, List[PIndexEntry]], db: PObjectDB) -> str:
@@ -100,7 +133,6 @@ def _build_tree_object(
             raise Exception(f"Internal error: index entry type incorrect ({en.type})")
         ob = ob + en.type + " " + key + " " + en.name + "\n"
 
-    print(f"DEBUG: _build_tree_object for '{d}': \n{ob}")
     return ob
 
 
@@ -147,9 +179,8 @@ def _read_index_from_file(fil: str) -> Dict[str, PIndexEntry]:
 
             ret = {}
             for s in lines:
-                ret[s[0:40]] = _str_to_entry(
-                    s
-                )  # FIXME remove 0:40 and take the value from the list
+                en = _str_to_entry(s)
+                ret[en[2]] = en
 
             return ret
     except Exception:
