@@ -82,12 +82,14 @@ class Index(PIndex):
         return _save_to_db_node("", raw_tree, self.db)
 
 
-def _save_to_db_node(d: str, tree: Dict[str, PIndexEntry], db: PObjectDB) -> str:
+def _save_to_db_node(d: str, tree: Dict[str, List[PIndexEntry]], db: PObjectDB) -> str:
     ob = _build_tree_object(d, tree, db)
     return db.put(ob.encode("UTF-8"), DBObjectType.TREE)
 
 
-def _build_tree_object(d: str, tree: Dict[str, PIndexEntry], db: PObjectDB) -> str:
+def _build_tree_object(
+    d: str, tree: Dict[str, List[PIndexEntry]], db: PObjectDB
+) -> str:
     ob = ""
     for en in tree[d]:
         if en.type == "f":
