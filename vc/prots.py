@@ -60,14 +60,27 @@ class PObjectDB(Protocol):
         ...
 
 
-PIndexEntry = NamedTuple("PIndexEntry", [("key", str), ("type", str), ("name", str)])
+IndexEntry = NamedTuple("IndexEntry", [("key", str), ("type", str), ("name", str)])
+
+FileStatus = NamedTuple(
+    "FileStatus",
+    [
+        ("new", bool),
+        ("modified", bool),
+        ("deleted", bool),
+        ("renamed", bool),
+    ],
+)
+
+FileStatusEntry = NamedTuple("FileStatusEntry", [("name", str), ("status", FileStatus)])
+
 IndexStatus = NamedTuple(
     "IndexStatus",
     [
         ("branch", str),
-        ("not_tracked", List[str]),
-        ("not_staged", List[str]),
-        ("staged", List[str]),
+        ("not_tracked", List[FileStatusEntry]),
+        ("not_staged", List[FileStatusEntry]),
+        ("staged", List[FileStatusEntry]),
     ],
 )
 

@@ -3,7 +3,7 @@
 import os.path
 
 from typing import Dict, Optional, List, Set
-from vc.prots import PIndex, PObjectDB, PIndexEntry, DBObjectType, IndexStatus
+from vc.prots import PIndex, PObjectDB, IndexEntry, DBObjectType, IndexStatus
 
 
 class Index(PIndex):
@@ -35,7 +35,7 @@ class Index(PIndex):
             bb = f.read()
 
         key = self.db.put(bb)
-        entries[key] = PIndexEntry(
+        entries[key] = IndexEntry(
             key,
             "f",
             os.path.relpath(fil_or_dir, self.root + "/.."),
@@ -75,7 +75,7 @@ class Index(PIndex):
             if d == p:
                 continue
             pn = raw_tree[p]
-            pn.append(PIndexEntry("", "d", d))
+            pn.append(IndexEntry("", "d", d))
 
         return _save_to_db_node("", raw_tree, self.db)
 
@@ -116,7 +116,7 @@ class Index(PIndex):
         return IndexStatus(branch, not_tracked, not_staged, staged)
 
 
-def _all_dirs_in_index(raw_tree: Dict[str, List[PIndexEntry]]) -> Set[str]:
+def _all_dirs_in_index(raw_tree: Dict[str, List[IndexEntry]]) -> Set[str]:
     dirs = set("")
     for d in set(raw_tree.keys()):
         for c in _subdirs(d):
@@ -138,14 +138,12 @@ def _prepare_commit(tree: str, parent_hash: str, message: str) -> str:
     return ret
 
 
-def _save_to_db_node(d: str, tree: Dict[str, List[PIndexEntry]], db: PObjectDB) -> str:
+def _save_to_db_node(d: str, tree: Dict[str, List[IndexEntry]], db: PObjectDB) -> str:
     ob = _build_tree_object(d, tree, db)
     return db.put(ob.encode("UTF-8"), DBObjectType.TREE)
 
 
-def _build_tree_object(
-    d: str, tree: Dict[str, List[PIndexEntry]], db: PObjectDB
-) -> str:
+def _build_tree_object(d: str, tree: Dict[str, List[IndexEntry]], db: PObjectDB) -> str:
     ob = ""
     for en in tree[d]:
         if en.type == "f":
@@ -180,21 +178,21 @@ def _parent_dir(d: str) -> Optional[str]:
     return "".join(d.split("/")[:-1])
 
 
-def _entry_to_str(e: PIndexEntry) -> str:
+def _entry_to_str(e: IndexEntry) -> str:
     return f"{e[0]} {e[1]} {e[2]}"
 
 
-def _str_to_entry(s: str) -> PIndexEntry:
-    return PIndexEntry(s[0:40], s[41], s[43:])
+def _str_to_entry(s: str) -> IndexEntry:
+    return IndexEntry(s[0:40], s[41], s[43:])
 
 
-def _write_index_to_file(idx: Dict[str, PIndexEntry], fil: str):
+def _write_index_to_file(idx: Dict[str, IndexEntry], fil: str):
     with open(fil, "w") as f:
         for it in idx.values():
             f.write(_entry_to_str(it) + "\n")
 
 
-def _read_index_from_file(fil: str) -> Dict[str, PIndexEntry]:
+def _read_index_from_file(fil: str) -> Dict[str, IndexEntry]:
     try:
         with open(fil, "r") as f:
             content: str = f.read()
@@ -210,11 +208,11 @@ def _read_index_from_file(fil: str) -> Dict[str, PIndexEntry]:
         return {}
 
 
-def _keyf_dir(e: PIndexEntry) -> str:
+def _keyf_dir(e: IndexEntry) -> str:
     return os.path.dirname(e.name)
 
 
-def _build_tree(idx: Dict[str, PIndexEntry]):
+def _build_tree(idx: Dict[str, IndexEntry]):
     ret: Dict[str, list] = {}
 
     for e in idx.values():
