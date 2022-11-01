@@ -62,25 +62,25 @@ class PObjectDB(Protocol):
 
 IndexEntry = NamedTuple("IndexEntry", [("key", str), ("type", str), ("name", str)])
 
-FileStatus = NamedTuple(
+FileStatus = Enum(
     "FileStatus",
     [
-        ("new", bool),
-        ("modified", bool),
-        ("deleted", bool),
-        ("renamed", bool),
+        ("NEW", "new"),
+        ("MODIFIED", "modified"),
+        ("DELETED", "deleted"),
+        ("RENAMED", "renamed"),
     ],
 )
 
-FileStatusEntry = NamedTuple("FileStatusEntry", [("name", str), ("status", FileStatus)])
+FileWithStatus = NamedTuple("FileWithStatus", [("name", str), ("status", FileStatus)])
 
 IndexStatus = NamedTuple(
     "IndexStatus",
     [
         ("branch", str),
-        ("not_tracked", List[FileStatusEntry]),
-        ("not_staged", List[FileStatusEntry]),
-        ("staged", List[FileStatusEntry]),
+        ("not_tracked", List[FileWithStatus]),
+        ("not_staged", List[FileWithStatus]),
+        ("staged", List[FileWithStatus]),
     ],
 )
 

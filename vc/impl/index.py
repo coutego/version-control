@@ -3,7 +3,15 @@
 import os.path
 
 from typing import Dict, Optional, List, Set
-from vc.prots import PIndex, PObjectDB, IndexEntry, DBObjectType, IndexStatus
+from vc.prots import (
+    PIndex,
+    PObjectDB,
+    IndexEntry,
+    DBObjectType,
+    IndexStatus,
+    FileStatus,
+    FileWithStatus,
+)
 
 
 class Index(PIndex):
@@ -106,14 +114,45 @@ class Index(PIndex):
         raw_tree = _build_tree(entries)
         dirs = _all_dirs_in_index(raw_tree)
 
-        # FIXME: implement
+        not_tracked: List[FileWithStatus] = []
+        not_staged: List[FileWithStatus] = []
+        staged: List[FileWithStatus] = []
 
         branch = "<DETACHED>"  # FIXME
-        not_tracked: List[str] = []
-        not_staged: List[str] = []
-        staged: List[str] = []
+
+        for d in dirs:
+            st = _status_dir(d, entries)
+            not_tracked.extend(st.not_tracked)
+            not_staged.extend(st.not_staged)
+            staged.extend(st.staged)
 
         return IndexStatus(branch, not_tracked, not_staged, staged)
+
+
+def _status_dir(d: str, entries: Dict[str, IndexEntry]) -> IndexStatus:
+    if d == "":
+        dprefix = ""
+    else:
+        dprefix = d + "/"
+
+    files_working_area = set([dprefix + n for n in os.listdir("./" + d)])
+    files_stage_area = set(_filter_files_dir(list(entries.keys()), d))
+
+    not_tracked = files_working_area.difference(files_stage_area)
+    staged = files_stage_area
+
+    return IndexStatus(
+        "",
+        [FileWithStatus(f, None) for f in not_tracked],
+        [],
+        [FileWithStatus(f, FileStatus.MODIFIED) for f in staged],
+    )
+
+
+def _filter_files_dir(names: List[str], dr: str):
+    if dr == "":
+        return [f for f in names if "/" not in f]
+    return [f for f in names if f.startswith(dr)]
 
 
 def _all_dirs_in_index(raw_tree: Dict[str, List[IndexEntry]]) -> Set[str]:
