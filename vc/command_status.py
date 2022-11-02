@@ -6,18 +6,18 @@ import argparse
 
 from typing import List
 
-from vc.prots import PCommandProcessor, PIndex, IndexStatus, FileWithStatus
+from vc.prots import PCommandProcessor, PRepo, RepoStatus, FileWithStatus
 
 
 class StatusCommand(PCommandProcessor):
     """Implementation of the 'status' command."""
 
     key = "status"
-    index: PIndex
+    repo: PRepo
 
-    def __init__(self, index: PIndex):
-        """Initialize object, preparing the parser."""
-        self.index = index
+    def __init__(self, repo: PRepo):
+        """Initialize the repo."""
+        self.repo = repo
 
         parser = argparse.ArgumentParser()
         parser.add_argument("files")
@@ -29,7 +29,7 @@ class StatusCommand(PCommandProcessor):
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
         # r = self.parser.parse_args(args) # FIXME: add option to specify files
-        st: IndexStatus = self.index.status()
+        st: RepoStatus = self.repo.status()
 
         msg = f"On branch {st.branch}\n"
         msg += _to_be_committed_2str(st.staged)

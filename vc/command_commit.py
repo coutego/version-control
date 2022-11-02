@@ -5,7 +5,7 @@ import argparse
 
 from typing import List
 
-from vc.prots import PCommandProcessor, PIndex, IndexStatus
+from vc.prots import PCommandProcessor, PIndex
 
 
 class CommitCommand(PCommandProcessor):

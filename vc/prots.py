@@ -1,9 +1,85 @@
 """Protocols for the different components of the VC."""
 
-from typing import Protocol, List, Optional, NamedTuple
+from dataclasses import dataclass
+from typing import Protocol, List, Optional, NamedTuple, Dict
 from enum import Enum
 
 
+#####################################
+# Repository
+#####################################
+FileName = str  # ex. 'foo.txt'
+DirName = str  # ex. 'src/module'
+Key = str  # Hash
+Branch = str  # Hash representing a branch
+
+FileStatus = Enum(
+    "FileStatus",
+    [
+        ("NEW", "new"),
+        ("MODIFIED", "modified"),
+        ("DELETED", "deleted"),
+        ("RENAMED", "renamed"),
+    ],
+)
+
+FileWithStatus = NamedTuple(
+    "FileWithStatus", [("name", FileName), ("status", Optional[FileStatus])]
+)
+
+
+FileType = str  # "f" or "d" FIXME: make it typesafe
+
+
+@dataclass
+class DirEntry:
+    """Entry of a directory. It has a name, a type and an optional hash."""
+
+    ename: FileName
+    etype: FileType
+    ehash: Key
+
+
+class DirDict(Dict[DirName, List[DirEntry]]):
+    """Dict mapping directories to the list of their contents."""
+
+    def contains_file(self, f: FileName) -> bool:
+        """Return True is the DirTree contains the given file."""
+        for k, fs in self.items():
+            if f in [fl.ename for fl in fs]:
+                return True
+        return False
+
+    def all_file_names(self) -> List[FileName]:
+        """Return all the (complete) file names in this DirTree."""
+        ret = []
+        for ens in self.values():
+            for f in ens:
+                ret.append(f.ename)
+
+        return ret
+
+
+@dataclass
+class RepoStatus:
+    """Captures the status of a repo."""
+
+    branch: Branch
+    not_tracked: List[FileWithStatus]
+    not_staged: List[FileWithStatus]
+    staged: List[FileWithStatus]
+
+
+class PRepo(Protocol):
+    """Represent a repository."""
+
+    def status(self) -> RepoStatus:
+        """Calculate and return the status of the repo."""
+
+
+#####################################
+# Object DB
+#####################################
 class DBObjectType(Enum):
     """Types of db object."""
 
@@ -60,19 +136,10 @@ class PObjectDB(Protocol):
         ...
 
 
+#####################################
+# Index (staging area)
+#####################################
 IndexEntry = NamedTuple("IndexEntry", [("key", str), ("type", str), ("name", str)])
-
-FileStatus = Enum(
-    "FileStatus",
-    [
-        ("NEW", "new"),
-        ("MODIFIED", "modified"),
-        ("DELETED", "deleted"),
-        ("RENAMED", "renamed"),
-    ],
-)
-
-FileWithStatus = NamedTuple("FileWithStatus", [("name", str), ("status", FileStatus)])
 
 IndexStatus = NamedTuple(
     "IndexStatus",
@@ -112,11 +179,14 @@ class PIndex(Protocol):
         """Commit this index, returning the hash of the commit."""
         ...
 
-    def status(self) -> IndexStatus:
-        """Return the current status of the working area with respect to the index."""
+    def dirtree(self) -> DirDict:
+        """Return the representation of the stage area as a DirTree."""
         ...
 
 
+#####################################
+# Commands
+#####################################
 class PCommandProcessor(Protocol):
     """Protocol implemented by the (sub)commands."""
 

@@ -14,6 +14,7 @@ from vc.command_status import StatusCommand
 from vc.impl.db import DB
 from vc.impl.sha1hasher import SHA1Hasher
 from vc.impl.index import Index
+from vc.impl.repo import Repo
 
 
 class MainCommandProcessor(PCommandProcessor):
@@ -26,13 +27,14 @@ class MainCommandProcessor(PCommandProcessor):
         """Build the object tree."""
         db = DB(SHA1Hasher())
         index = Index(db)
+        repo = Repo(index, db)
         procs = []
         procs.append(HashObjectCommand(db))
         procs.append(CatFileCommand(db))
         procs.append(InitCommand(db))
         procs.append(AddCommand(index))
         procs.append(CommitCommand(index))
-        procs.append(StatusCommand(index))
+        procs.append(StatusCommand(repo))
 
         for p in procs:
             self.processors[p.key] = p

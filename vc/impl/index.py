@@ -8,9 +8,11 @@ from vc.prots import (
     PObjectDB,
     IndexEntry,
     DBObjectType,
-    IndexStatus,
-    FileStatus,
-    FileWithStatus,
+    DirDict,
+    DirEntry,
+    Key,
+    FileType,
+    FileName,
 )
 
 
@@ -25,7 +27,7 @@ class Index(PIndex):
         self.db = db
         self.root = db.root_folder()
 
-    def stage_file(self, fil_or_dir: str):
+    def stage_file(self, fil_or_dir: str) -> None:
         """Stage the given file or directory to the index file.
 
         If the file has already been added, the entry is updated.
@@ -108,51 +110,19 @@ class Index(PIndex):
 
         return nkey
 
-    def status(self) -> IndexStatus:
-        """Return the current status of the working area with respect to the index."""
+    def dirtree(self) -> DirDict:
+        """Return the contents of the staging area as a DirDict."""
         entries = _read_index_from_file(self.root + "/index")
         raw_tree = _build_tree(entries)
-        dirs = _all_dirs_in_index(raw_tree)
 
-        not_tracked: List[FileWithStatus] = []
-        not_staged: List[FileWithStatus] = []
-        staged: List[FileWithStatus] = []
+        ret = DirDict()
+        for k, en in raw_tree.items():
+            for e in en:
+                if k not in ret.keys():
+                    ret[k] = []
+                ret[k].append(DirEntry(FileName(e.name), FileType(e.type), Key(e.key)))
 
-        branch = "<DETACHED>"  # FIXME
-
-        for d in dirs:
-            st = _status_dir(d, entries)
-            not_tracked.extend(st.not_tracked)
-            not_staged.extend(st.not_staged)
-            staged.extend(st.staged)
-
-        return IndexStatus(branch, not_tracked, not_staged, staged)
-
-
-def _status_dir(d: str, entries: Dict[str, IndexEntry]) -> IndexStatus:
-    if d == "":
-        dprefix = ""
-    else:
-        dprefix = d + "/"
-
-    files_working_area = set([dprefix + n for n in os.listdir("./" + d)])
-    files_stage_area = set(_filter_files_dir(list(entries.keys()), d))
-
-    not_tracked = files_working_area.difference(files_stage_area)
-    staged = files_stage_area
-
-    return IndexStatus(
-        "",
-        [FileWithStatus(f, None) for f in not_tracked],
-        [],
-        [FileWithStatus(f, FileStatus.MODIFIED) for f in staged],
-    )
-
-
-def _filter_files_dir(names: List[str], dr: str):
-    if dr == "":
-        return [f for f in names if "/" not in f]
-    return [f for f in names if f.startswith(dr)]
+        return ret
 
 
 def _all_dirs_in_index(raw_tree: Dict[str, List[IndexEntry]]) -> Set[str]:

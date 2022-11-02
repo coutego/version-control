@@ -40,6 +40,9 @@ class DB(PObjectDB):
 
     def get(self, key: str) -> Optional[DBObject]:
         """Get the contents associated with a key, returning them or None."""
+        if self.hasher.valid_hash(key):
+            return None
+
         lfname, ldirs, fname = self._filename_from_key(key)
 
         files = glob.glob(lfname + "*")
@@ -84,7 +87,7 @@ class DB(PObjectDB):
         if root is None:
             raise FileNotFoundError("Not in a repo")
         if not (isinstance(key, str)) or len(key) < 4:
-            raise Exception("Incorrect key")
+            raise Exception(f"Incorrect key: '{key}'")
         d = key[0:2]
         fname = key[2:]
         ldirs = root + "/objects/" + d
