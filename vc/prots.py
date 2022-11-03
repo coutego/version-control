@@ -75,6 +75,11 @@ class PRepo(Protocol):
 
     def status(self) -> RepoStatus:
         """Calculate and return the status of the repo."""
+        ...
+
+    def log(self) -> List[str]:  # FIXME: use a data structure
+        """Return the log entries for the current HEAD."""
+        ...
 
 
 #####################################

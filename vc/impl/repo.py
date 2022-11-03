@@ -33,6 +33,10 @@ class Repo(PRepo):
         """Calculate and return the status of the repo."""
         return _status(self.index, self.db)
 
+    def log(self) -> List[str]:  # FIXME: use a data structure
+        """Return the log entries for the current HEAD."""
+        return _log(self.db)
+
 
 @dataclass
 class Commit:
@@ -43,6 +47,14 @@ class Commit:
     comment: str
     author: str
     committer: str
+
+    @property
+    def short_comment(self) -> str:
+        lines = self.comment.splitlines()
+        for ln in lines:
+            if ln.strip() == "":
+                continue
+            return ln.strip()
 
     @staticmethod
     def from_str(s: str) -> Commit:
@@ -379,3 +391,23 @@ def _matches(patterns: List[str], s: str) -> bool:
             return True
 
     return False
+
+
+def _log(db: PObjectDB()) -> List[str]:  # FIXME: use a data structure
+    """Return the log entries for the current HEAD"""
+    ret = []
+
+    chash: Optional[str] = _read_head_hash(db)
+    while chash:
+        commit = Commit.from_hash(chash, db)
+        if commit is None:
+            return ret
+
+        ret.append(f"{chash[:7]} {commit.short_comment}")
+
+        if commit.parents and len(commit.parents) > 0:
+            chash = commit.parents[0]
+        else:
+            chash = None
+
+    return ret

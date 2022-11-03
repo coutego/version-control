@@ -11,6 +11,7 @@ from vc.command_init import InitCommand
 from vc.command_add import AddCommand
 from vc.command_commit import CommitCommand
 from vc.command_status import StatusCommand
+from vc.command_log import LogCommand
 from vc.impl.db import DB
 from vc.impl.sha1hasher import SHA1Hasher
 from vc.impl.index import Index
@@ -35,6 +36,7 @@ class MainCommandProcessor(PCommandProcessor):
         procs.append(AddCommand(index))
         procs.append(CommitCommand(index))
         procs.append(StatusCommand(repo))
+        procs.append(LogCommand(repo))
 
         for p in procs:
             self.processors[p.key] = p
