@@ -50,11 +50,14 @@ class Commit:
 
     @property
     def short_comment(self) -> str:
+        """Return the first line of the comment."""
         lines = self.comment.splitlines()
+        ret = ""
         for ln in lines:
-            if ln.strip() == "":
-                continue
-            return ln.strip()
+            if ln.strip() != "":
+                ret = ln.strip()
+                break
+        return ret
 
     @staticmethod
     def from_str(s: str) -> Commit:
@@ -227,7 +230,7 @@ def _add_file_to_repostatus(
     if _file_is_modified_in_working_tree(f, working_tree, staging_tree, db):
         rs.not_staged.append(FileWithStatus(f, FileStatus.MODIFIED))
 
-    if _file_is_modified_in_staging_tree(f, staging_tree, head_tree, db):
+    if _file_is_modified_in_staging_tree(f, staging_tree, head_tree):
         rs.staged.append(FileWithStatus(f, FileStatus.MODIFIED))
 
     return rs
@@ -260,7 +263,7 @@ def _file_is_modified_in_working_tree(
 
 
 def _file_is_modified_in_staging_tree(
-    f: FilePath, staging_tree: DirDict, head_tree: DirDict, db: PObjectDB
+    f: FilePath, staging_tree: DirDict, head_tree: DirDict
 ) -> bool:
     """Return True is f is modified in the staging tree, with respect to HEAD."""
     if f == "" or os.path.isdir(f):
@@ -393,9 +396,9 @@ def _matches(patterns: List[str], s: str) -> bool:
     return False
 
 
-def _log(db: PObjectDB()) -> List[str]:  # FIXME: use a data structure
-    """Return the log entries for the current HEAD"""
-    ret = []
+def _log(db: PObjectDB) -> List[str]:  # FIXME: use a data structure
+    """Return the log entries for the current HEAD."""
+    ret: List[str] = []
 
     chash: Optional[str] = _read_head_hash(db)
     while chash:

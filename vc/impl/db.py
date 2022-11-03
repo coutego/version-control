@@ -76,6 +76,7 @@ class DB(PObjectDB):
             typ = contents[0:idx_typ].decode("UTF-8")
             length = contents[idx_typ:idx_len].decode("UTF-8")
             contents = contents[idx_len + 1 :]
+
             return DBObject(DBObjectType(typ), int(length), contents)
 
     def init(self) -> None:
@@ -111,7 +112,7 @@ class DB(PObjectDB):
         fname = key[2:]
         ldirs = root + "/objects/" + d
         lfname = ldirs + "/" + fname
-        return (lfname, ldirs, fname)
+        return lfname, ldirs, fname
 
 
 def _find_vc_dir(startdir=os.curdir):
