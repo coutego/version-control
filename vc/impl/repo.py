@@ -227,12 +227,22 @@ def _file_is_modified_in_working_tree(
     """Return True is f is modified in the working tree, with respect to the index."""
     if f == "" or os.path.isdir(f):
         return False
+
     try:
         with open(f.file_name, "rb") as ff:
             bb = ff.read()
             k1 = db.calculate_key(bb)
-            fs = [ff for ff in staging_tree[f.dir] if ff.ename == f.file_name][0]
-            return fs.ehash == k1
+            if f.dir is None:  # FIXME: cleanup the usage of "" vs "." vs None
+                d = ""
+            else:
+                d = f.dir
+            st = staging_tree[d]
+            fss = [ff for ff in st if ff.ename == f.file_name]
+
+            if len(fss) == 0:
+                return False
+
+            return fss[0].ehash != k1
     except Exception:
         return False
 
