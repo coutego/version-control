@@ -53,15 +53,20 @@ class Commit:
         author = ""
         committer = ""
 
+        comment_started = False
         for ln in s.splitlines():
-            if ln.startswith("parent "):
-                parents.append(ln.removeprefix("parent ").strip())
-            elif ln.startswith("tree "):
-                tree_id = ln.removeprefix("tree ").strip()
-            elif ln.startswith("author "):
-                author = ln.removeprefix("author ").strip()
-            elif ln.startswith("commiter "):
-                committer = ln.removeprefix("commiter ").strip()
+            if not comment_started:
+                if ln.startswith("parent "):
+                    parents.append(ln.removeprefix("parent ").strip())
+                elif ln.startswith("tree "):
+                    tree_id = ln.removeprefix("tree ").strip()
+                elif ln.startswith("author "):
+                    author = ln.removeprefix("author ").strip()
+                elif ln.startswith("commiter "):
+                    committer = ln.removeprefix("commiter ").strip()
+                else:
+                    comment_started = True
+                    comment += ln + "\n"
             else:
                 comment += ln + "\n"
 
