@@ -3,6 +3,7 @@
 import os
 import os.path
 import glob
+import zlib
 from typing import Tuple, Optional, Union
 from vc.prots import PObjectDB, DBObject, DBObjectType, DBObjectKey, PHasher
 
@@ -18,9 +19,13 @@ class DB(PObjectDB):
         """Configure the hasher to use in the DB."""
         self.hasher = hasher
 
-    def calculate_key(self, bb: bytes):
+    def calculate_key(self, content: Union[bytes, str]):
         """Calculate the key using the internal hasher."""
-        return self.hasher.hash(bb)
+        if type(content) == str:
+            bcontent = content.encode("UTF-8")
+        elif type(content) == bytes:
+            bcontent = content
+        return self.hasher.hash(bcontent)
 
     def put(
         self, content: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB
@@ -35,6 +40,8 @@ class DB(PObjectDB):
 
         s = f"{typ.name.lower()} {len(b)}\0"
         bcontent = s.encode("UTF-8") + b
+        bcontent = zlib.compress(bcontent)
+        # FIXME: this compression doesn't match git results: look into that
 
         key = self.hasher.hash(bcontent)
         lfname, ldirs, fname = self._filename_from_key(key)
@@ -63,6 +70,7 @@ class DB(PObjectDB):
 
         with open(files[0], "rb") as f:
             contents = f.read()
+            contents = zlib.decompress(contents)
             idx_typ = contents.index(b" ")
             idx_len = contents.index(0)
             typ = contents[0:idx_typ].decode("UTF-8")
