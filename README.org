@@ -52,7 +52,7 @@ At the time of writing this README, this is the output for two cases.
 
 #+begin_src sh
 $ vc
-Command required. Available commands: hash-object, cat-file, init, add, commit
+Command required. Available commands: hash-object, cat-file, init, add, commit, status
 
 $ vc hash-object -h
 usage: __main__.py [-h] [-w] [--stdin] [file]
