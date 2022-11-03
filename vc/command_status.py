@@ -20,7 +20,7 @@ class StatusCommand(PCommandProcessor):
         self.repo = repo
 
         parser = argparse.ArgumentParser()
-        parser.add_argument("files")
+        parser.add_argument("files", nargs="*")
         try:
             self.parser = parser
         except Exception:
@@ -28,8 +28,9 @@ class StatusCommand(PCommandProcessor):
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
-        r = self.parser.parse_args(args)  # FIXME: implement option to specify files
-        if r.h:
+        # FIXME: implement option to specify files
+        r = self.parser.parse_args(args)
+        if r.__contains__("h"):
             self.parser.print_help(sys.stderr)
             return
 

@@ -97,7 +97,7 @@ class Commit:
         if c is None:
             return None
 
-        cs = c.contents.decode("UTF-8")
+        cs = c.text
         return Commit.from_str(cs)
 
 
@@ -284,9 +284,7 @@ def _add_tree_entries(d: DirName, key: str, db: PObjectDB, ret: DirDict) -> DirD
     if t is None:
         return ret
 
-    tree = Tree.from_str(
-        t.contents.decode("UTF-8")
-    )  # FIXME: remove all the repeating UTF-8
+    tree = Tree.from_str(t.text)
 
     ret[d] = []
     for en in tree.entries:
@@ -343,7 +341,7 @@ def _read_db_tree(db: PObjectDB, key: str, acc: DirDict = None) -> DirDict:
     linesr = db.get(key)
     if linesr is None:
         raise Exception(f"Object not found: '{key}'")
-    lines = linesr.contents.decode("UTF-8").splitlines()
+    lines = linesr.text.splitlines()
 
     for ln in lines:
         en = DirEntry(ln[43:], ln[0:40], ln[41])

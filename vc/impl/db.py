@@ -3,9 +3,7 @@
 import os
 import os.path
 import glob
-
-from typing import Tuple, Optional
-
+from typing import Tuple, Optional, Union
 from vc.prots import PObjectDB, DBObject, DBObjectType, DBObjectKey, PHasher
 
 VC_DIR = ".vc"
@@ -24,20 +22,32 @@ class DB(PObjectDB):
         """Calculate the key using the internal hasher."""
         return self.hasher.hash(bb)
 
-    def put(self, bb: bytes, typ: DBObjectType = DBObjectType.BLOB) -> DBObjectKey:
+    def put(
+        self, content: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB
+    ) -> DBObjectKey:
         """Associate the content bb to the key."""
         # FIXME: Apply the hash to the final compressed object, as git does
-        key = self.hasher.hash(bb)
+        b: bytes
+        if type(content) == bytes:
+            b = content
+        elif type(content) == str:
+            b = content.encode("UTF-8")
+
+        s = f"{typ.name.lower()} {len(b)}\0"
+        bcontent = s.encode("UTF-8") + b
+
+        key = self.hasher.hash(bcontent)
         lfname, ldirs, fname = self._filename_from_key(key)
+
         if os.path.exists(lfname):
             return key
 
         os.makedirs(ldirs, exist_ok=True)
 
         with open(lfname, "wb") as f:
-            s = f"{typ.name.lower()} {len(bb)}\0"
-            f.write(s.encode("UTF-8") + bb)
-            return key
+            f.write(bcontent)
+
+        return key
 
     def get(self, key: str) -> Optional[DBObject]:
         """Get the contents associated with a key, returning them or None."""

@@ -1,7 +1,7 @@
 """Protocols for the different components of the VC."""
 
 from dataclasses import dataclass
-from typing import Protocol, List, Optional, NamedTuple, Dict
+from typing import Protocol, List, Optional, NamedTuple, Dict, Union
 from enum import Enum
 
 
@@ -89,11 +89,21 @@ class DBObjectType(Enum):
     TAG = "tag"
 
 
-# Transfer object for objects in the DB
-DBObject = NamedTuple(
-    "DBObject", [("type", DBObjectType), ("size", int), ("contents", bytes)]
-)
 DBObjectKey = str
+
+
+@dataclass
+class DBObject:
+    """Representation of an object in the DB."""
+
+    type: DBObjectType
+    size: int
+    contents: bytes
+
+    @property
+    def text(self) -> str:
+        """Return the contents of the object, as a string."""
+        return self.contents.decode("UTF-8")
 
 
 class PHasher(Protocol):
@@ -115,7 +125,9 @@ class PObjectDB(Protocol):
         """Create and initialize the DB."""
         ...
 
-    def put(self, bb: bytes, typ: DBObjectType = DBObjectType.BLOB) -> DBObjectKey:
+    def put(
+        self, bb: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB
+    ) -> DBObjectKey:
         """Associate the content bb to the key.
 
         Return the object key if succesful (either new entry created or

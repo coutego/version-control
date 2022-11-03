@@ -103,7 +103,7 @@ class Index(PIndex):
                 parent = f.read()
 
         commit = _prepare_commit(self.save_to_db(), parent, message)
-        nkey = self.db.put(commit.encode("UTF-8"))
+        nkey = self.db.put(commit)
 
         with open(head, "w") as f:
             f.write(f"{nkey}\n")
@@ -149,7 +149,7 @@ def _prepare_commit(tree: str, parent_hash: str, message: str) -> str:
 
 def _save_to_db_node(d: str, tree: Dict[str, List[IndexEntry]], db: PObjectDB) -> str:
     ob = _build_tree_object(d, tree, db)
-    return db.put(ob.encode("UTF-8"), DBObjectType.TREE)
+    return db.put(ob, DBObjectType.TREE)
 
 
 def _build_tree_object(d: str, tree: Dict[str, List[IndexEntry]], db: PObjectDB) -> str:
