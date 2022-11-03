@@ -219,6 +219,7 @@ def _add_file_to_repostatus(
 def _file_is_modified_in_working_tree(
     f: FilePath, working_tree: DirDict, staging_tree: DirDict, db: PObjectDB
 ) -> bool:
+    """Return True is f is modified in the working tree, with respect to the index."""
     if f == "" or os.path.isdir(f):
         return False
     try:
@@ -234,6 +235,7 @@ def _file_is_modified_in_working_tree(
 def _file_is_modified_in_staging_tree(
     f: FilePath, staging_tree: DirDict, head_tree: DirDict, db: PObjectDB
 ) -> bool:
+    """Return True is f is modified in the staging tree, with respect to HEAD."""
     if f == "" or os.path.isdir(f):
         return False
     try:
@@ -245,7 +247,8 @@ def _file_is_modified_in_staging_tree(
 
 
 def _build_head_dict(db: PObjectDB) -> DirDict:
-    key = _head_hash(db)
+    """Build the DirDict for the current HEAD, from the DB."""
+    key = _read_head_hash(db)
     commit = Commit.from_hash(key, db)
 
     if commit is None:
@@ -257,12 +260,18 @@ def _build_head_dict(db: PObjectDB) -> DirDict:
 
 
 def _add_tree_entries(d: DirName, key: str, db: PObjectDB, ret: DirDict) -> DirDict:
+    """Recursively add the tree entries for the tree of hash key to the DirDict.
+
+    The passed DirDict is modified in place, even if it's also returned, for convenience.
+    """
     t = db.get(key)
 
     if t is None:
         return ret
 
-    tree = Tree.from_str(t.contents.decode("UTF-8"))
+    tree = Tree.from_str(
+        t.contents.decode("UTF-8")
+    )  # FIXME: remove all the repeating UTF-8
 
     ret[d] = []
     for en in tree.entries:
@@ -277,6 +286,7 @@ def _add_tree_entries(d: DirName, key: str, db: PObjectDB, ret: DirDict) -> DirD
 def _build_working_dict(
     dirs: List[DirName], ignorefn: Callable[[str], bool] = lambda x: False
 ) -> DirDict:
+    """Build the DirDict for the working dir, only taking into account entries in 'dirs'."""
     ret = DirDict()
 
     for d in dirs:
@@ -299,8 +309,8 @@ def _build_working_dict(
     return ret
 
 
-def _head_hash(db: PObjectDB) -> str:
-    """HEAD hash."""
+def _read_head_hash(db: PObjectDB) -> str:
+    """Read and return the hash for the current HEAD."""
     head = db.root_folder() + "/HEAD"
 
     if not os.path.exists(head):
@@ -311,7 +321,7 @@ def _head_hash(db: PObjectDB) -> str:
 
 
 def _read_db_tree(db: PObjectDB, key: str, acc: DirDict = None) -> DirDict:
-    """Read a tree object from the DB, recursively building the whole tree."""
+    """Read a tree object from the DB, recursively building the associated DirDict."""
     if acc is None:
         acc = DirDict()
 
