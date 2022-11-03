@@ -26,6 +26,7 @@ class DB(PObjectDB):
 
     def put(self, bb: bytes, typ: DBObjectType = DBObjectType.BLOB) -> DBObjectKey:
         """Associate the content bb to the key."""
+        # FIXME: Apply the hash to the final compressed object, as git does
         key = self.hasher.hash(bb)
         lfname, ldirs, fname = self._filename_from_key(key)
         if os.path.exists(lfname):
@@ -40,7 +41,7 @@ class DB(PObjectDB):
 
     def get(self, key: str) -> Optional[DBObject]:
         """Get the contents associated with a key, returning them or None."""
-        if self.hasher.valid_hash(key):
+        if key is None or key.strip() == "":
             return None
 
         lfname, ldirs, fname = self._filename_from_key(key)
