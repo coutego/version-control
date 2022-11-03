@@ -28,7 +28,11 @@ class StatusCommand(PCommandProcessor):
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
-        # r = self.parser.parse_args(args) # FIXME: add option to specify files
+        r = self.parser.parse_args(args)  # FIXME: implement option to specify files
+        if r.h:
+            self.parser.print_help(sys.stderr)
+            return
+
         st: RepoStatus = self.repo.status()
 
         msg = f"On branch {st.branch}\n"
