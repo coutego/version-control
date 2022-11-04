@@ -188,13 +188,12 @@ def _status(index: PIndex, db: PObjectDB) -> RepoStatus:
     not_staged: List[FileWithStatus] = []
     not_tracked: List[FileWithStatus] = []
 
-    ret = RepoStatus("*not implemented*", staged, not_staged, not_tracked)
+    ret = RepoStatus("*branches not implemented*", staged, not_staged, not_tracked)
 
     all_files = []
-    for d in dirs:
-        all_files.extend(staging_tree.all_file_names())
-        all_files.extend(working_tree.all_file_names())
-        all_files.extend(head_tree.all_file_names())
+    all_files.extend(staging_tree.all_file_names())
+    all_files.extend(working_tree.all_file_names())
+    all_files.extend(head_tree.all_file_names())
 
     set_all_files = set(all_files)
     for f in set_all_files:
@@ -332,7 +331,12 @@ def _build_working_dict(
                 typ = "f"
             if d not in ret:
                 ret[d] = []
-            ret[d].append(DirEntry(f, typ, ""))
+
+            a = f
+            if d != "":
+                a = d + "/" + a
+
+            ret[d].append(DirEntry(a, typ, ""))
 
     return ret
 
