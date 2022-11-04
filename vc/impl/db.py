@@ -21,29 +21,14 @@ class DB(PObjectDB):
 
     def calculate_key(self, content: Union[bytes, str]):
         """Calculate the key using the internal hasher."""
-        if type(content) == str:
-            bcontent = content.encode("UTF-8")
-        elif type(content) == bytes:
-            bcontent = content
-        return self.hasher.hash(bcontent)
+        key, bcontent = _prepare_to_save(self.hasher, content)
+        return key
 
     def put(
         self, content: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB
     ) -> DBObjectKey:
         """Associate the content bb to the key."""
-        # FIXME: Apply the hash to the final compressed object, as git does
-        b: bytes
-        if type(content) == bytes:
-            b = content
-        elif type(content) == str:
-            b = content.encode("UTF-8")
-
-        s = f"{typ.name.lower()} {len(b)}\0"
-        bcontent = s.encode("UTF-8") + b
-        bcontent = zlib.compress(bcontent)
-        # FIXME: this compression doesn't match git results: look into that
-
-        key = self.hasher.hash(bcontent)
+        key, bcontent = _prepare_to_save(self.hasher, content)
         lfname, ldirs, fname = self._filename_from_key(key)
 
         if os.path.exists(lfname):
@@ -127,3 +112,22 @@ def _find_vc_dir(startdir=os.curdir):
             return d
         prev = curr
         curr = prev + "/.."
+
+
+def _prepare_to_save(
+    hasher: PHasher, content: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB
+) -> Tuple[DBObjectKey, bytes]:
+    # FIXME: this compression doesn't match git results: look into that
+    b: bytes
+    if type(content) == bytes:
+        b = content
+    elif type(content) == str:
+        b = content.encode("UTF-8")
+
+    s = f"{typ.name.lower()} {len(b)}\0"
+    bcontent = s.encode("UTF-8") + b
+    bcontent = zlib.compress(bcontent)
+
+    key = hasher.hash(bcontent)
+
+    return key, bcontent
