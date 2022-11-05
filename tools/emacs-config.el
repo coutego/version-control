@@ -23,13 +23,6 @@
   "Open the current buffer in IntelliJ"
   (interactive)
   (save-buffer)
-  (message
-   (concat ctg-vc-intellij-command
-           " --line "
-           (int-to-string (line-number-at-pos))
-           " "
-           (buffer-file-name))
-   )
   (start-process-shell-command "IntelliJ"
                                "*IntelliJ*"
                                (concat ctg-vc-intellij-command
