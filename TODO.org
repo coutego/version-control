@@ -1,38 +1,113 @@
 #+title: Todo
+#+TODO: TODO(t) MAYBE(m) | DONE(d) CANCELLED(c)
 
-* DONE Make DB to use the hasher through a protocol instead of hardcoding it
+* Bugfixes
+** TODO Fix error: when adding file already commited with new changes, it doesn't show up
+*** Sample
+############# vc #############
+On branch *branches not implemented*
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .git
 
-* DONE Implement file-cat
+############# git #############
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   README.org
 
-* DONE Implement init
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .vc/
+** TODO Make 'status' on empty branch show files in root dir
+*** Sample
+############# vc #############
+On branch *branches not implemented*
+############# git #############
+On branch master
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        README.org
+        TODO.org
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+** TODO Show dirs in 'status' with a trailing slash
+*** Sample
+############# vc #############
+On branch *branches not implemented*
+Changes to be committed:
+  (use "vc restore --staged <file>..." to unstage)
+        new: README.org
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .git
+        TODO.org
+
+############# git #############
+On branch master
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+        new file:   README.org
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .vc/
+        TODO.org
+** MAYBE Show summary changes in 'commit'
+*** Sample
+############# vc #############
+############# git #############
+[master (root-commit) 2630898] Initial import
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 README.org
+** MAYBE Show colors in 'status'
+
+* Functionality
+** DONE Make DB to use the hasher through a protocol instead of hardcoding it
+
+** DONE Implement file-cat
+
+** DONE Implement init
 - [X] Create the empty structure
 
-* DONE Implement add [1/1]
+** DONE Implement add [1/1]
 - [X] Decide how to implement the index / stage area
 
-* TODO Implement 'log'
+** TODO Implement 'log'
 - [X] Only information as with option 'one-line'
 - [ ] Full information, no other option
 
-* TODO Implement 'status'
+** TODO Implement 'status'
 - [X] Implement with no options, no files specified
 - [ ] Implement with files specified
 
-* TODO Implement 'diff'
+** TODO Implement 'diff'
 - [ ] Implement with no options, no files specified
 - [ ] Implement with files specified
 
-* TODO Implement 'remove'
+** TODO Implement 'restore'
 - [ ] vc restore --staged <file-name>
 
-* TODO Implement 'commit' [1/2]
+** TODO Implement 'commit' [1/2]
 - [X] Without branches
 - [ ] With author and committer
 
-* TODO Implement 'checkout'
+** TODO Implement 'checkout'
 - [ ] From hash
 - [ ] From branch
 
-* TODO Implement branches
+** TODO Implement branches
 - [ ] Change commit to use references
 - [ ] Check unchecked files will not be overwritten
+
+** TODO Implement merge
+- [ ] Only when no files have changed in both branches
+- [ ] Indicate just one big conflict for the whole file
