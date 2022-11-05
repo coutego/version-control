@@ -23,6 +23,7 @@
   "Open the current buffer in IntelliJ"
   (interactive)
   (save-buffer)
+  (message "Opening IntelliJ")
   (start-process-shell-command "IntelliJ"
                                "*IntelliJ*"
                                (concat ctg-vc-intellij-command
@@ -30,6 +31,9 @@
                                        (int-to-string (line-number-at-pos))
                                        " "
                                        (buffer-file-name))))
+
+(define-key python-mode-map (kbd "C-c d") 'ctg-vc-debug)
+(define-key python-mode-map (kbd "C-c i") 'ctg-vc-open-in-intellij)
 
 (provide 'ctg-vc-config)
 ;;; emacs-config.el ends here
