@@ -3,7 +3,7 @@
 # Launch the vc program on the 'debug' dir, useful for debugging purposes
 # (in conjunction with 'breakpoint()' calls).
 #
-# This script needs the environment variable VC_PROJECT_ROOT to be set correctly.
+# This script needs the environment variable CTG_VC_PROJECT_ROOT to be set correctly.
 
 if [[ -z $CTG_VC_PROJECT_ROOT ]]; then
     echo "Please set the VC_PROJECT_ROOT environment variable to point to the root of the project."
