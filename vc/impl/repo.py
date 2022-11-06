@@ -170,7 +170,7 @@ class FilePath(str):
         if "/" not in self:
             return ""
         else:
-            return self.split("/")[:-1]
+            return "/".join(self.split("/")[:-1])
 
 
 def _status(index: PIndex, db: PObjectDB) -> RepoStatus:
@@ -240,7 +240,7 @@ def _file_is_modified_in_working_tree(
             else:
                 d = f.dir
             st = stag_dict[d]
-            fss = [ff for ff in st if ff.ename == f.file_name]
+            fss = [ff for ff in st if ff.ename == f]
             if len(fss) == 0:
                 return False
             return fss[0].ehash != k1
@@ -267,7 +267,7 @@ def _file_is_modified_in_staging_tree(
 def _get_file_entry_from_dirdict(f: FilePath, di: DirDict) -> Optional[DirEntry]:
     d: str = f.dir
     fs: List[DirEntry] = di[d] if d in di.keys() else []
-    fe = [ff for ff in fs if ff.ename == f.file_name]
+    fe = [ff for ff in fs if ff.ename == f]
     if len(fe) > 0:
         return fe[0]
     else:
