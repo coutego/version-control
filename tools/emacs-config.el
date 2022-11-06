@@ -17,6 +17,7 @@
 (defun ctg-vc-debug (args)
   "Start the debugger with an appropriate configuration"
   (interactive "MPass options to program: vc ")
+  (save-buffer)
   (realgud:pdb (concat ctg-vc-project-root "/tools/debug.sh " args)))
 
 (defun ctg-vc-open-in-intellij ()
