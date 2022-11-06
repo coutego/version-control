@@ -188,9 +188,9 @@ def _write_index_to_file(idx: Dict[str, IndexEntry], fil: str):
             f.write(_entry_to_str(it) + "\n")
 
 
-def _read_index_from_file(fil: str) -> Dict[str, IndexEntry]:
+def _read_index_from_file(filename: str) -> Dict[str, IndexEntry]:
     try:
-        with open(fil, "r") as f:
+        with open(filename, "r") as f:
             content: str = f.read()
             lines = content.splitlines()
             ret = {}
