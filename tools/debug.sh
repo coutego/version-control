@@ -16,4 +16,4 @@ fi
 
 cd $CTG_VC_PROJECT_ROOT/debug
 export PYTHONPATH=$CTG_VC_PROJECT_ROOT
-python3 -m vc "$@"
+python3 -m pdb -m vc "$@"
