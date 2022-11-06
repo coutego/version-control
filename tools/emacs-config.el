@@ -3,6 +3,7 @@
 
 (defconst ctg-vc-project-root (f-parent (f-parent (or load-file-name buffer-file-name))))
 (setenv "CTG_VC_PROJECT_ROOT" ctg-vc-project-root)
+(setenv "PYTHONPATH" (concat (getenv "PYTHONPATH") ":" ctg-vc-project-root))
 
 (defgroup ctg-vc nil
   "Edit commands for project CTG-VC"
