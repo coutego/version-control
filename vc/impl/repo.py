@@ -67,7 +67,6 @@ class Commit:
         comment = ""
         author = ""
         committer = ""
-
         comment_started = False
         for ln in s.splitlines():
             if not comment_started:
@@ -84,7 +83,6 @@ class Commit:
                     comment += ln + "\n"
             else:
                 comment += ln + "\n"
-
         return Commit(parents, tree_id, comment, author, committer)
 
     def to_str(self) -> str:
@@ -101,17 +99,14 @@ class Commit:
             ret += "committer " + self.committer + "\n"
         if self.comment:
             ret += "comment " + self.comment + "\n"
-
         return ret
 
     @staticmethod
     def from_hash(hsh: str, db: PObjectDB) -> Optional[Commit]:
         """Read a Commit from the db from its hash."""
         c = db.get(hsh)
-
         if c is None:
             return None
-
         cs = c.text
         return Commit.from_str(cs)
 
@@ -179,10 +174,10 @@ class FilePath(str):
 
 
 def _status(index: PIndex, db: PObjectDB) -> RepoStatus:
-    staging_tree: DirDict = index.dirtree()
-    dirs = list(staging_tree.keys())
-    working_tree: DirDict = _build_working_dict(dirs, _read_ignore(db))
-    head_tree: DirDict = _build_head_dict(db)
+    stag_dict: DirDict = index.dirtree()
+    dirs = list(stag_dict.keys())
+    work_dict: DirDict = _build_working_dict(dirs, _read_ignore(db))
+    head_dict: DirDict = _build_head_dict(db)
 
     staged: List[FileWithStatus] = []
     not_staged: List[FileWithStatus] = []
@@ -191,57 +186,50 @@ def _status(index: PIndex, db: PObjectDB) -> RepoStatus:
     ret = RepoStatus("*branches not implemented*", staged, not_staged, not_tracked)
 
     all_files = []
-    all_files.extend(staging_tree.all_file_names())
-    all_files.extend(working_tree.all_file_names())
-    all_files.extend(head_tree.all_file_names())
+    all_files.extend(stag_dict.all_file_names())
+    all_files.extend(work_dict.all_file_names())
+    all_files.extend(head_dict.all_file_names())
 
     set_all_files = set(all_files)
     for f in set_all_files:
         ret = _add_file_to_repostatus(
-            FilePath(f), ret, staging_tree, working_tree, head_tree, db
+            FilePath(f), ret, stag_dict, work_dict, head_dict, db
         )
-
     return ret
 
 
 def _add_file_to_repostatus(
     f: FilePath,
     rs: RepoStatus,
-    staging_tree: DirDict,
-    working_tree: DirDict,
-    head_tree: DirDict,
+    stag_dict: DirDict,
+    work_dict: DirDict,
+    head_dict: DirDict,
     db: PObjectDB,
 ) -> RepoStatus:
     if f == "":
         f = FilePath(".")
-
-    if not staging_tree.contains_file(f):
-        if working_tree.contains_file(f):
+    if not stag_dict.contains_file(f):
+        if work_dict.contains_file(f):
             rs.not_tracked.append(FileWithStatus(f, None))
             return rs
-        if head_tree.contains_file(f):
+        if head_dict.contains_file(f):
             rs.not_staged.append(FileWithStatus(f, FileStatus.DELETED))
             return rs
-
-    if not head_tree.contains_file(f):
+    if not head_dict.contains_file(f):
         rs.staged.append(FileWithStatus(f, FileStatus.NEW))
-
-    if _file_is_modified_in_working_tree(f, working_tree, staging_tree, db):
+    if _file_is_modified_in_working_tree(f, work_dict, stag_dict, db):
         rs.not_staged.append(FileWithStatus(f, FileStatus.MODIFIED))
-
-    if _file_is_modified_in_staging_tree(f, staging_tree, head_tree):
+    if _file_is_modified_in_staging_tree(f, stag_dict, head_dict):
         rs.staged.append(FileWithStatus(f, FileStatus.MODIFIED))
-
     return rs
 
 
 def _file_is_modified_in_working_tree(
-    f: FilePath, working_tree: DirDict, staging_tree: DirDict, db: PObjectDB
+    f: FilePath, work_dict: DirDict, stag_dict: DirDict, db: PObjectDB
 ) -> bool:
     """Return True is f is modified in the working tree, with respect to the index."""
     if f == "" or os.path.isdir(f):
         return False
-
     try:
         with open(f.file_name, "rb") as ff:
             bb = ff.read()
@@ -250,31 +238,32 @@ def _file_is_modified_in_working_tree(
                 d = ""
             else:
                 d = f.dir
-            st = staging_tree[d]
+            st = stag_dict[d]
             fss = [ff for ff in st if ff.ename == f.file_name]
-
             if len(fss) == 0:
                 return False
-
             return fss[0].ehash != k1
     except Exception:
         return False
 
 
 def _file_is_modified_in_staging_tree(
-    f: FilePath, staging_tree: DirDict, head_tree: DirDict
+    f: FilePath, stag_dict: DirDict, head_dict: DirDict
 ) -> bool:
     """Return True is f is modified in the staging tree, with respect to HEAD."""
     if f == "" or os.path.isdir(f):
         return False
-
-    if _get_file_from_dirdict(f, staging_tree).ehash == _get_file_from_dirdict(f, head_tree):
+    fes = _get_file_entry_from_dirdict(f, stag_dict)
+    feh = _get_file_entry_from_dirdict(f, head_dict)
+    fesh = fes.ehash if fes else ""
+    fehh = feh.ehash if feh else ""
+    if fesh == fehh:
         return False
     else:
         return True
 
 
-def _get_file_from_dirdict(f: FilePath, di: DirDict) -> Optional[DirEntry]:
+def _get_file_entry_from_dirdict(f: FilePath, di: DirDict) -> Optional[DirEntry]:
     d: str = f.dir
     fs: List[DirEntry] = di[d]
     fe = [ff for ff in fs if ff.ename == f.file_name]
@@ -288,12 +277,9 @@ def _build_head_dict(db: PObjectDB) -> DirDict:
     """Build the DirDict for the current HEAD, from the DB."""
     key = _read_head_hash(db)
     commit = Commit.from_hash(key, db)
-
     if commit is None:
         return DirDict()
-
     key = commit.tree_id
-
     return _add_tree_entries("", key, db, DirDict())
 
 
@@ -303,19 +289,15 @@ def _add_tree_entries(d: DirName, key: str, db: PObjectDB, ret: DirDict) -> DirD
     The passed DirDict is modified in place, even if it's also returned, for convenience.
     """
     t = db.get(key)
-
     if t is None:
         return ret
-
     tree = Tree.from_str(t.text)
-
     ret[d] = []
     for en in tree.entries:
         if en.type == "d":
             _add_tree_entries(d + "/" + en.name, en.hash, db, ret)
         else:
             ret[d].append(DirEntry(en.name, en.type, en.hash))
-
     return ret
 
 
@@ -324,7 +306,6 @@ def _build_working_dict(
 ) -> DirDict:
     """Build the DirDict for the working dir, only taking into account entries in 'dirs'."""
     ret = DirDict()
-
     for d in dirs:
         if d == "":
             dd = "."
@@ -340,23 +321,18 @@ def _build_working_dict(
                 typ = "f"
             if d not in ret:
                 ret[d] = []
-
             a = f
             if d != "":
                 a = d + "/" + a
-
             ret[d].append(DirEntry(a, typ, ""))
-
     return ret
 
 
 def _read_head_hash(db: PObjectDB) -> str:
     """Read and return the hash for the current HEAD."""
     head = db.root_folder() + "/HEAD"
-
     if not os.path.exists(head):
         return ""
-
     with open(head, "r") as f:
         return f.read().strip()  # FIXME: follow references
 
@@ -365,65 +341,50 @@ def _read_db_tree(db: PObjectDB, key: str, acc: DirDict = None) -> DirDict:
     """Read a tree object from the DB, recursively building the associated DirDict."""
     if acc is None:
         acc = DirDict()
-
     linesr = db.get(key)
     if linesr is None:
         raise Exception(f"Object not found: '{key}'")
     lines = linesr.text.splitlines()
-
     for ln in lines:
         en = DirEntry(ln[43:], ln[0:40], ln[41])
         enp = FilePath(en.ename)
-
         if en.etype == "d":
             _read_db_tree(db, en.ehash, acc)
-
         ens = acc[enp]
         if ens is None:
             acc[enp] = []
-
         acc[enp].append(en)
-
     return acc
 
 
 def _read_ignore(db: PObjectDB) -> Callable[[str], bool]:
     vcignore = db.root_folder() + "/../.vcignore"
-
     entries = ".vc\n"  # Never track the .vc dir
-
     if os.path.exists(vcignore):
         with open(vcignore, "r") as f:
             entries += f.read()
-
     return lambda x: _matches(entries.splitlines(), x)
 
 
 def _matches(patterns: List[str], s: str) -> bool:
     import re
-
     for p in patterns:
         if re.match(f"^{p}$", s):
             return True
-
     return False
 
 
 def _log(db: PObjectDB) -> List[str]:  # FIXME: use a data structure
     """Return the log entries for the current HEAD."""
     ret: List[str] = []
-
     chash: Optional[str] = _read_head_hash(db)
     while chash:
         commit = Commit.from_hash(chash, db)
         if commit is None:
             return ret
-
         ret.append(f"{chash[:7]} {commit.short_comment}")
-
         if commit.parents and len(commit.parents) > 0:
             chash = commit.parents[0]
         else:
             chash = None
-
     return ret
