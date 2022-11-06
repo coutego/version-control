@@ -267,12 +267,21 @@ def _file_is_modified_in_staging_tree(
     """Return True is f is modified in the staging tree, with respect to HEAD."""
     if f == "" or os.path.isdir(f):
         return False
-    try:
-        fs = [ff for ff in staging_tree[f.dir] if ff.ename == f.file_name][0]
-        fh = [ff for ff in head_tree[f.dir] if ff.ename == f.file_name][0]
-        return fs.ehash == fh.ehash
-    except Exception:
+
+    if _get_file_from_dirdict(f, staging_tree).ehash == _get_file_from_dirdict(f, head_tree):
         return False
+    else:
+        return True
+
+
+def _get_file_from_dirdict(f: FilePath, di: DirDict) -> Optional[DirEntry]:
+    d: str = f.dir
+    fs: List[DirEntry] = di[d]
+    fe = [ff for ff in fs if ff.ename == f.file_name]
+    if len(fe) > 0:
+        return fe[0]
+    else:
+        return None
 
 
 def _build_head_dict(db: PObjectDB) -> DirDict:
