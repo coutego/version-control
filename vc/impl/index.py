@@ -34,16 +34,12 @@ class Index(PIndex):
         If the file has not been added, add it.
         """
         entries = _read_index_from_file(self.root + "/index")
-
         if os.path.isdir(fil_or_dir):
             raise Exception("Directories are not supported yet.")
-
         if not (os.path.isfile(fil_or_dir)):
             raise FileNotFoundError(f"Not a valid file '{fil_or_dir}'")
-
         with open(fil_or_dir, "rb") as f:
             bb = f.read()
-
         key = self.db.put(bb)
         entries[key] = IndexEntry(
             key,
@@ -61,7 +57,6 @@ class Index(PIndex):
 
         if os.path.isdir(fil):
             raise Exception("Directories are not supported yet.")
-
         if not (os.path.isfile(fil)):
             raise FileNotFoundError(f"Not a valid file '{fil}'")
 
@@ -75,53 +70,45 @@ class Index(PIndex):
 
         # Ensure all the intermediate dirs are in the tree
         dirs = _all_dirs_in_index(raw_tree)
-
         for d in dirs:
             if d not in raw_tree.keys():
                 raw_tree[d] = []
-
         for d in raw_tree.keys():
             p = _parent_dir(d)
             if d == p:
                 continue
             pn = raw_tree[p]
             pn.append(IndexEntry("", "d", d))
-
         return _save_to_db_node("", raw_tree, self.db)
 
     def commit(self, message: str = None) -> str:
         """Commit the current index, returning the commit hash."""
         if message is None:
             message = "<no commit message>"
-
         root = self.db.root_folder()
         head = root + "/HEAD"
-
         parent = ""
+
         if os.path.exists(head):
             with open(head, "r") as f:
                 parent = f.read()
 
         commit = _prepare_commit(self.save_to_db(), parent, message)
         nkey = self.db.put(commit)
-
         with open(head, "w") as f:
             f.write(f"{nkey}\n")
-
         return nkey
 
     def dirtree(self) -> DirDict:
         """Return the contents of the staging area as a DirDict."""
         entries = _read_index_from_file(self.root + "/index")
         raw_tree = _build_tree(entries)
-
         ret = DirDict()
         for k, en in raw_tree.items():
             for e in en:
                 if k not in ret.keys():
                     ret[k] = []
                 ret[k].append(DirEntry(FileName(e.name), FileType(e.type), Key(e.key)))
-
         return ret
 
 
@@ -206,12 +193,10 @@ def _read_index_from_file(fil: str) -> Dict[str, IndexEntry]:
         with open(fil, "r") as f:
             content: str = f.read()
             lines = content.splitlines()
-
             ret = {}
             for s in lines:
                 en = _str_to_entry(s)
                 ret[en[2]] = en
-
             return ret
     except Exception:
         return {}
@@ -223,12 +208,10 @@ def _keyf_dir(e: IndexEntry) -> str:
 
 def _build_tree(idx: Dict[str, IndexEntry]):
     ret: Dict[str, list] = {}
-
     for e in idx.values():
         k, t, n = e
         d = os.path.dirname(n)
         if not ret.get(d):
             ret[d] = []
         ret[d].append(e)
-
     return ret
