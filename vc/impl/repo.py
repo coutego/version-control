@@ -265,7 +265,7 @@ def _file_is_modified_in_staging_tree(
 
 def _get_file_entry_from_dirdict(f: FilePath, di: DirDict) -> Optional[DirEntry]:
     d: str = f.dir
-    fs: List[DirEntry] = di[d]
+    fs: List[DirEntry] = di[d] if d in di.keys() else []
     fe = [ff for ff in fs if ff.ename == f.file_name]
     if len(fe) > 0:
         return fe[0]
