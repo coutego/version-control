@@ -2,7 +2,7 @@
 #+TODO: TODO(t) MAYBE(m) | DONE(d) CANCELLED(c)
 
 * Bugfixes
-** TODO Fix error: when adding file already commited with new changes, it doesn't show up
+** DONE Fix error: when adding file already commited with new changes, it doesn't show up
 *** Sample
 ############# vc #############
 On branch *branches not implemented*
@@ -34,7 +34,34 @@ Untracked files:
         TODO.org
 
 nothing added to commit but untracked files present (use "git add" to track)
+** DONE Prevent files appearing as new and modified at the same time
+*** Sample
+pedro@Tuxedo:~/projects/python/version-control/debug$ g status
+############# vc #############
+On branch *branches not implemented*
+Changes to be committed:
+  (use "vc restore --staged <file>..." to unstage)
+        new file: TODO.org
+        modified: TODO.org
 
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .git
+        README.org
+
+############# git #############
+On branch master
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+        new file:   TODO.org
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .vc/
+        README.org
 ** TODO Show dirs in 'status' with a trailing slash
 *** Sample
 ############# vc #############

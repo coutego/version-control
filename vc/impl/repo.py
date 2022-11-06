@@ -211,16 +211,17 @@ def _add_file_to_repostatus(
     if not stag_dict.contains_file(f):
         if work_dict.contains_file(f):
             rs.not_tracked.append(FileWithStatus(f, None))
-            return rs
+            return rs  # We are done
         if head_dict.contains_file(f):
             rs.not_staged.append(FileWithStatus(f, FileStatus.DELETED))
-            return rs
-    if not head_dict.contains_file(f):
-        rs.staged.append(FileWithStatus(f, FileStatus.NEW))
+            return rs  # We are done
+    if _file_is_modified_in_staging_tree(f, stag_dict, head_dict):
+        if not head_dict.contains_file(f):
+            rs.staged.append(FileWithStatus(f, FileStatus.NEW))
+        else:
+            rs.staged.append(FileWithStatus(f, FileStatus.MODIFIED))
     if _file_is_modified_in_working_tree(f, work_dict, stag_dict, db):
         rs.not_staged.append(FileWithStatus(f, FileStatus.MODIFIED))
-    if _file_is_modified_in_staging_tree(f, stag_dict, head_dict):
-        rs.staged.append(FileWithStatus(f, FileStatus.MODIFIED))
     return rs
 
 
