@@ -30,29 +30,21 @@ class DB(PObjectDB):
         """Associate the content bb to the key."""
         key, bcontent = _prepare_to_save(self.hasher, content)
         lfname, ldirs, fname = self._filename_from_key(key)
-
         if os.path.exists(lfname):
             return key
-
         os.makedirs(ldirs, exist_ok=True)
-
         with open(lfname, "wb") as f:
             f.write(bcontent)
-
         return key
 
     def get(self, key: str) -> Optional[DBObject]:
         """Get the contents associated with a key, returning them or None."""
         if key is None or key.strip() == "":
             return None
-
         lfname, ldirs, fname = self._filename_from_key(key)
-
         files = glob.glob(lfname + "*")
-
         if len(files) != 1:
             return None
-
         with open(files[0], "rb") as f:
             contents = f.read()
             contents = zlib.decompress(contents)
@@ -61,7 +53,6 @@ class DB(PObjectDB):
             typ = contents[0:idx_typ].decode("UTF-8")
             length = contents[idx_typ:idx_len].decode("UTF-8")
             contents = contents[idx_len + 1 :]
-
             return DBObject(DBObjectType(typ), int(length), contents)
 
     def init(self) -> None:
@@ -70,7 +61,6 @@ class DB(PObjectDB):
         if root:
             print(f"Repository already exists at '{os.path.abspath(root)}'")
             return
-
         os.mkdir(VC_DIR)
         os.mkdir(VC_DIR + "/objects")
         d = os.path.realpath(os.path.curdir) + "/" + VC_DIR
@@ -123,11 +113,8 @@ def _prepare_to_save(
         b = content
     elif type(content) == str:
         b = content.encode("UTF-8")
-
     s = f"{typ.name.lower()} {len(b)}\0"
     bcontent = s.encode("UTF-8") + b
     bcontent = zlib.compress(bcontent)
-
     key = hasher.hash(bcontent)
-
     return key, bcontent
