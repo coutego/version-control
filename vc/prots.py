@@ -16,16 +16,20 @@ Branch = str  # Hash representing a branch
 FileStatus = Enum(
     "FileStatus",
     [
-        ("NEW", "new"),
+        ("NEW", "new file"),
         ("MODIFIED", "modified"),
         ("DELETED", "deleted"),
         ("RENAMED", "renamed"),
     ],
 )
 
-FileWithStatus = NamedTuple(
-    "FileWithStatus", [("name", FileName), ("status", Optional[FileStatus])]
-)
+
+@dataclass
+class FileWithStatus:
+    """Representation of a file with a status, for the status report."""
+
+    name: FileName
+    status: Optional[FileStatus]
 
 
 FileType = str  # "f" or "d" FIXME: make it typesafe
