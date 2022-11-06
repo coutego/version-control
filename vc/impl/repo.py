@@ -296,7 +296,8 @@ def _add_tree_entries(d: DirName, key: str, db: PObjectDB, ret: DirDict) -> DirD
     ret[d] = []
     for en in tree.entries:
         if en.type == "d":
-            _add_tree_entries(d + "/" + en.name, en.hash, db, ret)
+            dd = d + "/" if d != "" else ""
+            _add_tree_entries(dd + en.name, en.hash, db, ret)
         else:
             ret[d].append(DirEntry(en.name, en.type, en.hash))
     return ret
