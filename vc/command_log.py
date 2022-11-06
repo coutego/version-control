@@ -20,6 +20,7 @@ class LogCommand(PCommandProcessor):
         self.repo = repo
 
         parser = argparse.ArgumentParser()
+        parser.add_argument("--oneline", action="store_true")
         parser.add_argument("files", nargs="*")
         try:
             self.parser = parser
