@@ -127,7 +127,7 @@ class TreeEntry:
     @staticmethod
     def from_str(s: str) -> TreeEntry:
         """Build a TreeEntry from its str file representation."""
-        h, t, *r = s.split(" ")
+        t, h, *r = s.split(" ")
         n = " ".join(r)  # In case the file name has spaces
         return TreeEntry(h, t, n)
 
@@ -173,7 +173,7 @@ class FilePath(str):
     def dir(self):
         """Return the directory of the file, without the filename."""
         if "/" not in self:
-            "."
+            return ""
         else:
             return self.split("/")[:-1]
 
