@@ -3,6 +3,7 @@
 from __future__ import annotations  # For factory methods in Commit, etc.
 import os
 import os.path
+from itertools import dropwhile
 from dataclasses import dataclass
 from typing import List, Optional, Callable
 from vc.prots import (
@@ -15,6 +16,7 @@ from vc.prots import (
     FileStatus,
     DirEntry,
     DirDict,
+    FileName,
 )
 
 
@@ -36,6 +38,15 @@ class Repo(PRepo):
     def log(self) -> List[str]:  # FIXME: use a data structure
         """Return the log entries for the current HEAD."""
         return _log(self.db)
+
+    def checkout(self, commit_id) -> str:
+        """Checkout the commit and return its short message.
+
+        Any errors are thrown as an exception, with a message ready to
+        be shown to the end user.
+        """
+        return _checkout(self.index, self.db, commit_id)
+        ...
 
 
 @dataclass
@@ -83,6 +94,8 @@ class Commit:
                     comment += ln + "\n"
             else:
                 comment += ln + "\n"
+        clns = dropwhile(lambda x: "" == x.strip(), comment.splitlines())
+        comment = "\n".join(clns)
         return Commit(parents, tree_id, comment, author, committer)
 
     def to_str(self) -> str:
@@ -370,6 +383,7 @@ def _read_ignore(db: PObjectDB) -> Callable[[str], bool]:
 
 def _matches(patterns: List[str], s: str) -> bool:
     import re
+
     for p in patterns:
         if re.match(f"^{p}$", s):
             return True
@@ -390,3 +404,44 @@ def _log(db: PObjectDB) -> List[str]:  # FIXME: use a data structure
         else:
             chash = None
     return ret
+
+
+def _checkout(index: PIndex, db: PObjectDB, commit_id: str) -> str:
+    commit = Commit.from_hash(commit_id, db)
+    if commit is None:
+        raise Exception(
+            f"error: pathspec '{commit_id}' did not match any file(s) known to vc"
+        )
+
+    de = _dirty_entries_in_index(index, db)
+    if de:
+        raise Exception(
+            "error: Your local changes to the following files would be overwritten by checkout:\n"
+            + "       "
+            + ", ".join([f for f in de])
+            + "\n"
+            + "Please commit your changes or stash them before you switch branches.\n"
+            + "Aborting"
+        )
+    return commit.comment.splitlines()[0]
+
+
+def _dirty_entries_in_index(index: PIndex, db: PObjectDB) -> List[FileName]:
+    """Return the list of entries which are 'dirty' (different than in HEAD)."""
+    ret: List[FileName] = []
+    tree = index.dirtree()
+    head_dict = _build_head_dict(db)
+    for d in tree.keys():
+        for f in tree[d]:
+            if _is_dirty_in_index(f, db, head_dict):
+                ret.append(f.ename)
+    return ret
+
+
+def _is_dirty_in_index(f: DirEntry, db: PObjectDB, head_dict: DirDict) -> bool:
+    with open(f.ename, "rb") as ff:
+        hsh = db.calculate_key(ff.read())
+    if f.ehash == hsh:
+        return False
+    else:
+        return True

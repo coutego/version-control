@@ -63,6 +63,14 @@ class DirDict(Dict[DirName, List[DirEntry]]):
 
         return ret
 
+    def find_entry(self, f: FileName) -> Optional[DirEntry]:
+        """Find the entry for the given filename and return it."""
+        for k, fs in self.items():
+            for fl in fs:
+                if fl.ename == f:
+                    return fl
+        return None  # FIXME: implement contains_file on top of this method
+
 
 @dataclass
 class RepoStatus:
@@ -83,6 +91,14 @@ class PRepo(Protocol):
 
     def log(self) -> List[str]:  # FIXME: use a data structure
         """Return the log entries for the current HEAD."""
+        ...
+
+    def checkout(self, commit_id) -> str:
+        """Checkout the commit and return its short message.
+
+        Any errors are thrown as an exception, with a message ready to
+        be shown to the end user.
+        """
         ...
 
 
