@@ -87,11 +87,9 @@ class PRepo(Protocol):
 
     def status(self) -> RepoStatus:
         """Calculate and return the status of the repo."""
-        ...
 
     def log(self) -> List[str]:  # FIXME: use a data structure
         """Return the log entries for the current HEAD."""
-        ...
 
     def checkout(self, commit_id) -> str:
         """Checkout the commit and return its short message.
@@ -99,7 +97,6 @@ class PRepo(Protocol):
         Any errors are thrown as an exception, with a message ready to
         be shown to the end user.
         """
-        ...
 
 
 #####################################
@@ -136,11 +133,9 @@ class PHasher(Protocol):
 
     def hash(self, bb: bytes) -> str:
         """Calculate the hash for the given bytes."""
-        ...
 
     def valid_hash(self, hsh: str) -> bool:
         """Return True if hsh is a valid hash, False otherwise."""
-        ...
 
 
 class PObjectDB(Protocol):
@@ -148,7 +143,6 @@ class PObjectDB(Protocol):
 
     def init(self) -> None:
         """Create and initialize the DB."""
-        ...
 
     def put(
         self, bb: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB
@@ -158,19 +152,15 @@ class PObjectDB(Protocol):
         Return the object key if succesful (either new entry created or
         an existing one found).
         """
-        ...
 
     def calculate_key(self, bb: bytes):
         """Calculate the key for a given contents, same as in 'put'."""
-        ...
 
     def get(self, key: str) -> Optional[DBObject]:
         """Get the contents associated with a key, returning them or None."""
-        ...
 
     def root_folder(self) -> str:
         """Return the root folder where this DB is located."""
-        ...
 
 
 #####################################
@@ -198,27 +188,21 @@ class PIndex(Protocol):
         If the file has already been added, the entry is updated.
         If the file has not been added, add it.
         """
-        ...
 
     def unstage_file(self, fil: str):
         """Unstages the file, from the file, reverting it to the previous state."""
-        ...
 
     def remove_file(self, fil: str):
         """Remove the file from the index, making it not tracked."""
-        ...
 
     def save_to_db(self) -> str:
         """Save the Index to the DB, returning the key of the saved object."""
-        ...
 
     def commit(self, message: str = None) -> str:
         """Commit this index, returning the hash of the commit."""
-        ...
 
     def dirtree(self) -> DirDict:
         """Return the representation of the stage area as a DirTree."""
-        ...
 
 
 #####################################
@@ -230,8 +214,6 @@ class PCommandProcessor(Protocol):
     @property
     def key(self) -> str:
         """Return the key of this command."""
-        ...
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
-        ...
