@@ -25,19 +25,21 @@ class Repo(PRepo):
 
     index: PIndex
     db: PObjectDB
+    root: str
 
-    def __init__(self, index: PIndex, db: PObjectDB):
+    def __init__(self, index: PIndex, db: PObjectDB, root: str):
         """Initialize the index and db."""
         self.index = index
         self.db = db
+        self.root = root
 
     def status(self) -> RepoStatus:
         """Calculate and return the status of the repo."""
-        return _status(self.index, self.db)
+        return _status(self.index, self.db, self.root)
 
     def log(self) -> List[str]:  # FIXME: use a data structure
         """Return the log entries for the current HEAD."""
-        return _log(self.db)
+        return _log(self.db, self.root)
 
     def checkout(self, commit_id) -> str:
         """Checkout the commit and return its short message.
@@ -45,8 +47,7 @@ class Repo(PRepo):
         Any errors are thrown as an exception, with a message ready to
         be shown to the end user.
         """
-        return _checkout(self.index, self.db, commit_id)
-        ...
+        return _checkout(self.index, self.db, self.root, commit_id)
 
 
 @dataclass
@@ -174,23 +175,21 @@ class FilePath(str):
         """Return the file name, without the path."""
         if "/" not in self:
             return self
-        else:
-            return self.split("/")[-1]
+        return self.split("/")[-1]
 
     @property
     def dir(self):
         """Return the directory of the file, without the filename."""
         if "/" not in self:
             return ""
-        else:
-            return "/".join(self.split("/")[:-1])
+        return "/".join(self.split("/")[:-1])
 
 
-def _status(index: PIndex, db: PObjectDB) -> RepoStatus:
+def _status(index: PIndex, db: PObjectDB, root: str) -> RepoStatus:
     stag_dict: DirDict = index.dirtree()
     dirs = list(stag_dict.keys())
-    work_dict: DirDict = _build_working_dict(dirs, _read_ignore(db))
-    head_dict: DirDict = _build_head_dict(db)
+    work_dict: DirDict = _build_working_dict(dirs, _read_ignore(root))
+    head_dict: DirDict = _build_head_dict(db, root)
 
     staged: List[FileWithStatus] = []
     not_staged: List[FileWithStatus] = []
@@ -287,9 +286,9 @@ def _get_file_entry_from_dirdict(f: FilePath, di: DirDict) -> Optional[DirEntry]
         return None
 
 
-def _build_head_dict(db: PObjectDB) -> DirDict:
+def _build_head_dict(db: PObjectDB, root: str) -> DirDict:
     """Build the DirDict for the current HEAD, from the DB."""
-    key = _read_head_hash(db)
+    key = _read_head_hash(root)
     commit = Commit.from_hash(key, db)
     if commit is None:
         return DirDict()
@@ -343,9 +342,9 @@ def _build_working_dict(
     return ret
 
 
-def _read_head_hash(db: PObjectDB) -> str:
+def _read_head_hash(root: str) -> str:
     """Read and return the hash for the current HEAD."""
-    head = db.root_folder() + "/HEAD"
+    head = root + "/HEAD"
     if not os.path.exists(head):
         return ""
     with open(head, "r") as f:
@@ -372,8 +371,8 @@ def _read_db_tree(db: PObjectDB, key: str, acc: DirDict = None) -> DirDict:
     return acc
 
 
-def _read_ignore(db: PObjectDB) -> Callable[[str], bool]:
-    vcignore = db.root_folder() + "/../.vcignore"
+def _read_ignore(root: str) -> Callable[[str], bool]:
+    vcignore = root + "/../.vcignore"
     entries = ".vc\n"  # Never track the .vc dir
     if os.path.exists(vcignore):
         with open(vcignore, "r") as f:
@@ -390,10 +389,10 @@ def _matches(patterns: List[str], s: str) -> bool:
     return False
 
 
-def _log(db: PObjectDB) -> List[str]:  # FIXME: use a data structure
+def _log(db: PObjectDB, root: str) -> List[str]:  # FIXME: use a data structure
     """Return the log entries for the current HEAD."""
     ret: List[str] = []
-    chash: Optional[str] = _read_head_hash(db)
+    chash: Optional[str] = _read_head_hash(root)
     while chash:
         commit = Commit.from_hash(chash, db)
         if commit is None:
@@ -406,14 +405,14 @@ def _log(db: PObjectDB) -> List[str]:  # FIXME: use a data structure
     return ret
 
 
-def _checkout(index: PIndex, db: PObjectDB, commit_id: str) -> str:
+def _checkout(index: PIndex, db: PObjectDB, root: str, commit_id: str) -> str:
     commit = Commit.from_hash(commit_id, db)
     if commit is None:
         raise Exception(
             f"error: pathspec '{commit_id}' did not match any file(s) known to vc"
         )
 
-    de = _dirty_entries_in_index(index, db)
+    de = _dirty_entries_in_index(index, db, root)
     if de:
         raise Exception(
             "error: Your local changes to the following files would be overwritten by checkout:\n"
@@ -426,11 +425,11 @@ def _checkout(index: PIndex, db: PObjectDB, commit_id: str) -> str:
     return commit.comment.splitlines()[0]
 
 
-def _dirty_entries_in_index(index: PIndex, db: PObjectDB) -> List[FileName]:
+def _dirty_entries_in_index(index: PIndex, db: PObjectDB, root: str) -> List[FileName]:
     """Return the list of entries which are 'dirty' (different than in HEAD)."""
     ret: List[FileName] = []
     tree = index.dirtree()
-    head_dict = _build_head_dict(db)
+    head_dict = _build_head_dict(db, root)
     for d in tree.keys():
         for f in tree[d]:
             if _is_dirty_in_index(f, db, head_dict):

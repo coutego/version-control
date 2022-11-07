@@ -145,7 +145,7 @@ class PObjectDB(Protocol):
         """Create and initialize the DB."""
 
     def put(
-        self, bb: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB
+        self, content: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB
     ) -> DBObjectKey:
         """Associate the content bb to the key.
 
@@ -153,14 +153,11 @@ class PObjectDB(Protocol):
         an existing one found).
         """
 
-    def calculate_key(self, bb: bytes):
+    def calculate_key(self, content: bytes):
         """Calculate the key for a given contents, same as in 'put'."""
 
     def get(self, key: str) -> Optional[DBObject]:
         """Get the contents associated with a key, returning them or None."""
-
-    def root_folder(self) -> str:
-        """Return the root folder where this DB is located."""
 
 
 #####################################

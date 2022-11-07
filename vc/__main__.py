@@ -13,6 +13,7 @@ from vc.command_commit import CommitCommand
 from vc.command_status import StatusCommand
 from vc.command_log import LogCommand
 from vc.command_checkout import CheckoutCommand
+from vc.impl.fs import find_vc_root_dir
 from vc.impl.db import DB
 from vc.impl.sha1hasher import SHA1Hasher
 from vc.impl.index import Index
@@ -27,13 +28,14 @@ class MainCommandProcessor(PCommandProcessor):
 
     def __init__(self):
         """Build the object tree."""
-        db = DB(SHA1Hasher())
-        index = Index(db)
-        repo = Repo(index, db)
+        root = find_vc_root_dir()
+        db = DB(SHA1Hasher(), root)
+        index = Index(db, root)
+        repo = Repo(index, db, root)
         procs = []
         procs.append(HashObjectCommand(db))
         procs.append(CatFileCommand(db))
-        procs.append(InitCommand(db))
+        procs.append(InitCommand())
         procs.append(AddCommand(index))
         procs.append(CommitCommand(index))
         procs.append(StatusCommand(repo))

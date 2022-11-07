@@ -22,10 +22,10 @@ class Index(PIndex):
     db: PObjectDB
     root: str
 
-    def __init__(self, db: PObjectDB):
+    def __init__(self, db: PObjectDB, root: str):
         """Initialize the object."""
         self.db = db
-        self.root = db.root_folder()
+        self.root = root
 
     def stage_file(self, fil_or_dir: str) -> None:
         """Stage the given file or directory to the index file.
@@ -60,8 +60,8 @@ class Index(PIndex):
         if not (os.path.isfile(fil)):
             raise FileNotFoundError(f"Not a valid file '{fil}'")
 
-        del entries[os.path.relpath(fil, self.db.root_folder())]
-        _write_index_to_file(entries, self.db.root_folder() + "/index")
+        del entries[os.path.relpath(fil, self.root)]
+        _write_index_to_file(entries, self.root + "/index")
 
     def save_to_db(self) -> str:
         """Save the Index to the DB, returning the key of the saved object."""
@@ -85,7 +85,7 @@ class Index(PIndex):
         """Commit the current index, returning the commit hash."""
         if message is None:
             message = "<no commit message>"
-        root = self.db.root_folder()
+        root = self.root
         head = root + "/HEAD"
         parent = ""
 
