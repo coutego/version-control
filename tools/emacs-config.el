@@ -1,5 +1,7 @@
+;;; emacs-config --- Specific Emacs configuration for this project
 ;; -*- lexical-binding: t; -*-
-;; Specific emacs configuration and utilities for this project
+;;; Commentary:
+;; Specific Emacs configuration and utilities for this project
 ;;; Code:
 
 (require 'realgud)
