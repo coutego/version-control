@@ -85,6 +85,14 @@ class PRepo(Protocol):
         """Return the log entries for the current HEAD."""
         ...
 
+    def checkout(self, commit_id) -> str:
+        """Checkout the commit and return its short message.
+
+        Any errors are thrown as an exception, with a message ready to
+        be shown to the end user.
+        """
+        ...
+
 
 #####################################
 # Object DB

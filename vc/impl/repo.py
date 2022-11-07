@@ -3,6 +3,7 @@
 from __future__ import annotations  # For factory methods in Commit, etc.
 import os
 import os.path
+from itertools import dropwhile
 from dataclasses import dataclass
 from typing import List, Optional, Callable
 from vc.prots import (
@@ -36,6 +37,15 @@ class Repo(PRepo):
     def log(self) -> List[str]:  # FIXME: use a data structure
         """Return the log entries for the current HEAD."""
         return _log(self.db)
+
+    def checkout(self, commit_id) -> str:
+        """Checkout the commit and return its short message.
+
+        Any errors are thrown as an exception, with a message ready to
+        be shown to the end user.
+        """
+        return _checkout(self.index, self.db, commit_id)
+        ...
 
 
 @dataclass
@@ -83,6 +93,8 @@ class Commit:
                     comment += ln + "\n"
             else:
                 comment += ln + "\n"
+        clns = dropwhile(lambda x: "" == x.strip(), comment.splitlines())
+        comment = "\n".join(clns)
         return Commit(parents, tree_id, comment, author, committer)
 
     def to_str(self) -> str:
@@ -370,6 +382,7 @@ def _read_ignore(db: PObjectDB) -> Callable[[str], bool]:
 
 def _matches(patterns: List[str], s: str) -> bool:
     import re
+
     for p in patterns:
         if re.match(f"^{p}$", s):
             return True
@@ -390,3 +403,12 @@ def _log(db: PObjectDB) -> List[str]:  # FIXME: use a data structure
         else:
             chash = None
     return ret
+
+
+def _checkout(index: PIndex, db: PObjectDB, commit_id: str) -> str:
+    commit = Commit.from_hash(commit_id, db)
+    if commit is None:
+        raise Exception(
+            f"error: pathspec '{commit_id}' did not match any file(s) known to vc"
+        )
+    return commit.comment.splitlines()[0]
