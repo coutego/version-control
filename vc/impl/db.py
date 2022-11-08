@@ -59,7 +59,7 @@ class DB(PObjectDB):
 
     def _filename_from_key(self, key: str) -> Tuple[str, str, str]:
         root = self.root
-        if root is None:
+        if root is None or not os.path.isdir(root):
             raise FileNotFoundError("Not in a repo")
         if not (isinstance(key, str)) or len(key) < 4:
             raise Exception(f"Incorrect key: '{key}'")

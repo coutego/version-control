@@ -34,3 +34,16 @@ class DBTest(TestCase):
         h = db.put(c)
         ob = db.get(h).text
         self.assertEqual(c, ob)
+
+    def test_incorrect_root(self):
+        db = DB(SHA1Hasher(), "i dont exist sldkfjsdlkfjds")
+        try:
+            db.get("abcdefgh")
+            self.fail("FileNotFoundError expected")
+        except FileNotFoundError:
+            pass
+        try:
+            db.put("abcdefgh")
+            self.fail("FileNotFoundError expected")
+        except FileNotFoundError:
+            pass
