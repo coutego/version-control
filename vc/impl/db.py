@@ -57,15 +57,8 @@ class DB(PObjectDB):
             contents = contents[idx_len + 1 :]
             return DBObject(DBObjectType(typ), int(length), contents)
 
-    def __find_dir(self) -> str:
-        """Find the root dir of the VCS.
-
-        The current implementation only searches in the current dir.
-        """
-        return _find_vc_dir()
-
     def _filename_from_key(self, key: str) -> Tuple[str, str, str]:
-        root = self.__find_dir()
+        root = self.root
         if root is None:
             raise FileNotFoundError("Not in a repo")
         if not (isinstance(key, str)) or len(key) < 4:
@@ -75,20 +68,6 @@ class DB(PObjectDB):
         ldirs = root + "/objects/" + d
         lfname = ldirs + "/" + fname
         return lfname, ldirs, fname
-
-
-def _find_vc_dir(startdir=os.curdir):
-    curr = startdir
-    prev = None
-
-    while True:
-        if prev and os.path.realpath(curr) == os.path.realpath(prev):
-            return None
-        d = curr + "/" + VC_DIR
-        if os.path.isdir(d):
-            return d
-        prev = curr
-        curr = prev + "/.."
 
 
 def _prepare_to_save(
