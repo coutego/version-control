@@ -156,8 +156,11 @@ class PObjectDB(Protocol):
     def calculate_key(self, content: bytes):
         """Calculate the key for a given contents, same as in 'put'."""
 
-    def get(self, key: str) -> Optional[DBObject]:
-        """Get the contents associated with a key, returning them or None."""
+    def get(self, key: str) -> DBObject:
+        """Get the contents associated with a key.
+
+        Return the db object or raise a FileNotFoundError if not found.
+        """
 
 
 #####################################

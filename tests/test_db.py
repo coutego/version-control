@@ -23,10 +23,10 @@ class DBTest(TestCase):
 
     def test_not_found(self):
         db = self.db
-        r = db.get("I dont exist")
-        self.assertEqual(r, None)
-        r = db.get(None)
-        self.assertEqual(r, None)
+        with self.assertRaises(FileNotFoundError):
+            db.get("I dont exist")
+        with self.assertRaises(FileNotFoundError):
+            db.get(None)
 
     def test_basic_save(self):
         db = self.db
@@ -37,13 +37,14 @@ class DBTest(TestCase):
 
     def test_incorrect_root(self):
         db = DB(SHA1Hasher(), "i dont exist sldkfjsdlkfjds")
-        try:
+        with self.assertRaises(FileNotFoundError):
             db.get("abcdefgh")
-            self.fail("FileNotFoundError expected")
-        except FileNotFoundError:
-            pass
-        try:
+        with self.assertRaises(FileNotFoundError):
             db.put("abcdefgh")
-            self.fail("FileNotFoundError expected")
-        except FileNotFoundError:
-            pass
+
+    def test_incorrect_key(self):
+        db = self.db
+        with self.assertRaises(FileNotFoundError):
+            db.get(None)
+        with self.assertRaises(FileNotFoundError):
+            db.get("")

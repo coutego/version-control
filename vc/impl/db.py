@@ -39,14 +39,14 @@ class DB(PObjectDB):
             f.write(bcontent)
         return key
 
-    def get(self, key: str) -> Optional[DBObject]:
+    def get(self, key: str) -> DBObject:
         """Get the contents associated with a key, returning them or None."""
         if key is None or key.strip() == "":
-            return None
+            raise FileNotFoundError("Empty key")
         lfname, _, _ = self._filename_from_key(key)
         files = glob.glob(lfname + "*")
         if len(files) != 1:
-            return None
+            raise FileNotFoundError("Object not found")
         with open(files[0], "rb") as f:
             contents = f.read()
             contents = zlib.decompress(contents)
@@ -62,7 +62,7 @@ class DB(PObjectDB):
         if root is None or not os.path.isdir(root):
             raise FileNotFoundError("Not in a repo")
         if not (isinstance(key, str)) or len(key) < 4:
-            raise Exception(f"Incorrect key: '{key}'")
+            raise FileNotFoundError(f"Incorrect key format: '{key}'")
         d = key[0:2]
         fname = key[2:]
         ldirs = root + "/objects/" + d
