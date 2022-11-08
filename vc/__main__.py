@@ -15,7 +15,6 @@ from vc.command_log import LogCommand
 from vc.command_checkout import CheckoutCommand
 from vc.impl.fs import find_vc_root_dir
 from vc.impl.db import DB
-from vc.impl.sha1hasher import SHA1Hasher
 from vc.impl.index import Index
 from vc.impl.repo import Repo
 
@@ -29,7 +28,7 @@ class MainCommandProcessor(PCommandProcessor):
     def __init__(self):
         """Build the object tree."""
         root = find_vc_root_dir()
-        db = DB(SHA1Hasher(), root)
+        db = DB(root)
         index = Index(db, root)
         repo = Repo(index, db, root)
         procs = []

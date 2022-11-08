@@ -1,3 +1,4 @@
+;; Misusing .dir-locals.el to eval tools/emacs-config.el
 ((nil
   .
   ((eval

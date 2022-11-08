@@ -4,8 +4,9 @@ import os
 import os.path
 import glob
 import zlib
-from typing import Tuple, Optional, Union
-from vc.prots import PObjectDB, DBObject, DBObjectType, DBObjectKey, PHasher
+import hashlib
+from typing import Tuple, Union
+from vc.prots import PObjectDB, DBObject, DBObjectType, DBObjectKey
 
 VC_DIR = ".vc"
 
@@ -13,24 +14,24 @@ VC_DIR = ".vc"
 class DB(PObjectDB):
     """Default implementation of the PDB protocol."""
 
-    hasher: PHasher
     root: str
 
-    def __init__(self, hasher: PHasher, root: str):
+    def __init__(self, root: str):
         """Configure the hasher to use in the DB."""
-        self.hasher = hasher
+        if not root or not os.path.isdir(root):
+            raise FileNotFoundError(f"File path doesn't exist: '{root}'")
         self.root = root
 
     def calculate_key(self, content: Union[bytes, str]):
         """Calculate the key using the internal hasher."""
-        key, _ = _prepare_to_save(self.hasher, content)
+        key, _ = _prepare_to_save(content)
         return key
 
     def put(
         self, content: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB
     ) -> DBObjectKey:
         """Associate the content bb to the key."""
-        key, bcontent = _prepare_to_save(self.hasher, content)
+        key, bcontent = _prepare_to_save(content)
         lfname, ldirs, _ = self._filename_from_key(key)
         if os.path.exists(lfname):
             return key
@@ -71,7 +72,7 @@ class DB(PObjectDB):
 
 
 def _prepare_to_save(
-    hasher: PHasher, content: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB
+    content: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB
 ) -> Tuple[DBObjectKey, bytes]:
     # FIXME: this compression doesn't match git results: look into that
     bs: bytes
@@ -82,5 +83,5 @@ def _prepare_to_save(
     s = f"{typ.name.lower()} {len(bs)}\0"
     bcontent = s.encode("UTF-8") + bs
     bcontent = zlib.compress(bcontent)
-    key = hasher.hash(bcontent)
+    key = hashlib.sha1(bcontent).hexdigest()
     return key, bcontent

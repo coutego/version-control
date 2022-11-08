@@ -128,16 +128,6 @@ class DBObject:
         return self.contents.decode("UTF-8")
 
 
-class PHasher(Protocol):
-    """Responsible to calculate hashes to be used as DB keys."""
-
-    def hash(self, bb: bytes) -> str:
-        """Calculate the hash for the given bytes."""
-
-    def valid_hash(self, hsh: str) -> bool:
-        """Return True if hsh is a valid hash, False otherwise."""
-
-
 class PObjectDB(Protocol):
     """Interactions with the underlying DB."""
 
