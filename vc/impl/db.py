@@ -18,12 +18,13 @@ class DB(PObjectDB):
 
     def __init__(self, root: str):
         """Configure the hasher to use in the DB."""
-        if not root or not os.path.isdir(root):
+        if root and not os.path.isdir(root):
             raise FileNotFoundError(f"File path doesn't exist: '{root}'")
         self.root = root
 
     def calculate_key(self, content: Union[bytes, str]):
         """Calculate the key using the internal hasher."""
+        self._check_repo()
         key, _ = _prepare_to_save(content)
         return key
 
@@ -31,6 +32,7 @@ class DB(PObjectDB):
         self, content: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB
     ) -> DBObjectKey:
         """Associate the content bb to the key."""
+        self._check_repo()
         key, bcontent = _prepare_to_save(content)
         lfname, ldirs, _ = self._filename_from_key(key)
         if os.path.exists(lfname):
@@ -42,6 +44,7 @@ class DB(PObjectDB):
 
     def get(self, key: str) -> DBObject:
         """Get the contents associated with a key, returning them or None."""
+        self._check_repo()
         if key is None or key.strip() == "":
             raise FileNotFoundError("Empty key")
         lfname, _, _ = self._filename_from_key(key)
@@ -59,9 +62,8 @@ class DB(PObjectDB):
             return DBObject(DBObjectType(typ), int(length), contents)
 
     def _filename_from_key(self, key: str) -> Tuple[str, str, str]:
+        self._check_repo()
         root = self.root
-        if root is None or not os.path.isdir(root):
-            raise FileNotFoundError("Not in a repo")
         if not (isinstance(key, str)) or len(key) < 4:
             raise FileNotFoundError(f"Incorrect key format: '{key}'")
         d = key[0:2]
@@ -69,6 +71,10 @@ class DB(PObjectDB):
         ldirs = root + "/objects/" + d
         lfname = ldirs + "/" + fname
         return lfname, ldirs, fname
+
+    def _check_repo(self) -> None:
+        if self.root is None or not os.path.isdir(self.root):
+            raise FileNotFoundError("Not in a repo")
 
 
 def _prepare_to_save(

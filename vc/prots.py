@@ -131,9 +131,6 @@ class DBObject:
 class PObjectDB(Protocol):
     """Interactions with the underlying DB."""
 
-    def init(self) -> None:
-        """Create and initialize the DB."""
-
     def put(
         self, content: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB
     ) -> DBObjectKey:

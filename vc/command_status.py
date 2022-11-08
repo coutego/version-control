@@ -34,7 +34,14 @@ class StatusCommand(PCommandProcessor):
             self.parser.print_help(sys.stderr)
             return
 
-        st: RepoStatus = self.repo.status()
+        try:
+            st: RepoStatus = self.repo.status()
+        except FileNotFoundError:
+            print(
+                "fatal: not a vc repository (or any of the parent directories): .vc",
+                file=sys.stderr,
+            )
+            exit(1)
 
         msg = f"On branch {st.branch}\n"
         msg += _to_be_committed_2str(st.staged)

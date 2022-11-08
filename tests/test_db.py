@@ -34,10 +34,9 @@ class DBTest(TestCase):
         self.assertEqual(c, ob)
 
     def test_incorrect_root(self):
+        DB(None)
         with self.assertRaises(FileNotFoundError):
             DB("i dont exist sldkfjsdlkfjds")
-        with self.assertRaises(FileNotFoundError):
-            DB(None)
 
     def test_incorrect_key(self):
         db = self.db
@@ -47,8 +46,9 @@ class DBTest(TestCase):
             db.get("")
 
     def test_none_root(self):
+        db = DB(None)
         with self.assertRaises(FileNotFoundError):
-            DB(None)
+            db.calculate_key("abc")
 
 
 if __name__ == "__main__":
