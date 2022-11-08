@@ -25,7 +25,7 @@ def find_vc_root_dir(startdir=os.curdir) -> Optional[str]:
 
 def create_vc_root_dir(parent_dir=os.curdir) -> str:
     """Create a repo in the current dir (or parent_dir)."""
-    d = os.path.realpath(os.path.curdir) + "/" + VC_DIR
+    d = os.path.realpath(parent_dir) + "/" + VC_DIR
     if os.path.exists(d):
         raise Exception(f"File '{d}' already exists.")
     os.mkdir(d)
