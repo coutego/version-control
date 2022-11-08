@@ -186,6 +186,8 @@ class FilePath(str):
 
 
 def _status(index: PIndex, db: PObjectDB, root: str) -> RepoStatus:
+    if root is None or root.strip() == "":
+        raise FileNotFoundError("Not in a repository")
     stag_dict: DirDict = index.dirtree()
     dirs = list(stag_dict.keys())
     work_dict: DirDict = _build_working_dict(dirs, _read_ignore(root))
@@ -289,6 +291,8 @@ def _get_file_entry_from_dirdict(f: FilePath, di: DirDict) -> Optional[DirEntry]
 def _build_head_dict(db: PObjectDB, root: str) -> DirDict:
     """Build the DirDict for the current HEAD, from the DB."""
     key = _read_head_hash(root)
+    if key is None or key == "":
+        return DirDict()
     commit = Commit.from_hash(key, db)
     if commit is None:
         return DirDict()

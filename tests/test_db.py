@@ -1,5 +1,6 @@
 import tempfile
 import shutil
+import unittest
 from unittest import TestCase
 from vc.prots import PObjectDB
 from vc.impl.db import DB
@@ -12,7 +13,6 @@ class DBTest(TestCase):
 
     def setUp(self):
         self.root = tempfile.mkdtemp(dir=tempfile.gettempdir())
-
         create_vc_root_dir(self.root)
         self.db = DB(self.root)
 
@@ -49,3 +49,7 @@ class DBTest(TestCase):
     def test_none_root(self):
         with self.assertRaises(FileNotFoundError):
             DB(None)
+
+
+if __name__ == "__main__":
+    unittest.main()

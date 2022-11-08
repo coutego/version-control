@@ -27,7 +27,7 @@ class MainCommandProcessor(PCommandProcessor):
 
     def __init__(self):
         """Build the object tree."""
-        root = find_vc_root_dir()
+        root = find_vc_root_dir() or "."
         db = DB(root)
         index = Index(db, root)
         repo = Repo(index, db, root)
