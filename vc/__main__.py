@@ -4,19 +4,19 @@
 
 import sys
 from typing import Dict, List
-from vc.prots import PCommandProcessor
-from vc.command_hash_object import HashObjectCommand
-from vc.command_cat_file import CatFileCommand
-from vc.command_init import InitCommand
-from vc.command_add import AddCommand
-from vc.command_commit import CommitCommand
-from vc.command_status import StatusCommand
-from vc.command_log import LogCommand
-from vc.command_checkout import CheckoutCommand
-from vc.impl.fs import find_vc_root_dir
-from vc.impl.db import DB
-from vc.impl.index import Index
-from vc.impl.repo import Repo
+from .prots import PCommandProcessor
+from .command_hash_object import HashObjectCommand
+from .command_cat_file import CatFileCommand
+from .command_init import InitCommand
+from .command_add import AddCommand
+from .command_commit import CommitCommand
+from .command_status import StatusCommand
+from .command_log import LogCommand
+from .command_checkout import CheckoutCommand
+from .impl.fs import find_vc_root_dir
+from .impl.db import DB
+from .impl.index import Index
+from .impl.repo import Repo
 
 
 class MainCommandProcessor(PCommandProcessor):
@@ -32,11 +32,11 @@ class MainCommandProcessor(PCommandProcessor):
         index = Index(db, root)
         repo = Repo(index, db, root)
         procs = []
-        procs.append(HashObjectCommand(db))
-        procs.append(CatFileCommand(db))
+        procs.append(HashObjectCommand(repo))
+        procs.append(CatFileCommand(repo))
         procs.append(InitCommand())
-        procs.append(AddCommand(index))
-        procs.append(CommitCommand(index))
+        procs.append(AddCommand(repo))
+        procs.append(CommitCommand(repo))
         procs.append(StatusCommand(repo))
         procs.append(LogCommand(repo))
         procs.append(CheckoutCommand(repo))

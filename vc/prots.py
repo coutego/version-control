@@ -6,8 +6,12 @@ from enum import Enum
 
 
 #####################################
-# Repository
+# Common types used by the Protocols
 #####################################
+class VCUserException(Exception):
+    """Exception for errors to show to the end user."""
+
+
 FileName = str  # ex. 'foo.txt'
 DirName = str  # ex. 'src/module'
 Key = str  # Hash
@@ -70,33 +74,6 @@ class DirDict(Dict[DirName, List[DirEntry]]):
                 if fl.ename == f:
                     return fl
         return None  # FIXME: implement contains_file on top of this method
-
-
-@dataclass
-class RepoStatus:
-    """Captures the status of a repo."""
-
-    branch: Branch
-    not_tracked: List[FileWithStatus]
-    not_staged: List[FileWithStatus]
-    staged: List[FileWithStatus]
-
-
-class PRepo(Protocol):
-    """Represent a repository."""
-
-    def status(self) -> RepoStatus:
-        """Calculate and return the status of the repo."""
-
-    def log(self) -> List[str]:  # FIXME: use a data structure
-        """Return the log entries for the current HEAD."""
-
-    def checkout(self, commit_id) -> str:
-        """Checkout the commit and return its short message.
-
-        Any errors are thrown as an exception, with a message ready to
-        be shown to the end user.
-        """
 
 
 #####################################
@@ -190,6 +167,49 @@ class PIndex(Protocol):
 
     def dirtree(self) -> DirDict:
         """Return the representation of the stage area as a DirTree."""
+
+
+#####################################
+# Repository
+#####################################
+
+
+@dataclass
+class RepoStatus:
+    """Captures the status of a repo."""
+
+    branch: Branch
+    not_tracked: List[FileWithStatus]
+    not_staged: List[FileWithStatus]
+    staged: List[FileWithStatus]
+
+
+class PRepo(Protocol):
+    """Represent a repository."""
+
+    def status(self) -> RepoStatus:
+        """Calculate and return the status of the repo."""
+
+    def log(self) -> List[str]:  # FIXME: use a data structure
+        """Return the log entries for the current HEAD."""
+
+    def checkout(self, commit_id) -> str:
+        """Checkout the commit and return its short message.
+
+        Any errors are thrown as an exception, with a message ready to
+        be shown to the end user.
+        """
+
+    def initialized(self) -> bool:
+        """Check whether the repo has been initialized or not."""
+
+    @property
+    def db(self) -> PObjectDB:
+        """Return the db used by this repo."""
+
+    @property
+    def index(self) -> PIndex:
+        """Return the index used by this repo."""
 
 
 #####################################

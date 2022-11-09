@@ -2,21 +2,20 @@
 
 import sys
 import argparse
-
 from typing import List
-
-from vc.prots import PCommandProcessor, PIndex
+from .prots import PCommandProcessor, PRepo
+from .util import require_initialized_repo
 
 
 class CommitCommand(PCommandProcessor):
     """Implementation of the 'commit' command."""
 
     key = "commit"
-    index: PIndex
+    repo: PRepo
 
-    def __init__(self, index: PIndex):
+    def __init__(self, repo: PRepo):
         """Initialize object, preparing the parser."""
-        self.index = index
+        self.repo = repo
 
         parser = argparse.ArgumentParser()
         parser.add_argument("-m", required=True)
@@ -27,5 +26,6 @@ class CommitCommand(PCommandProcessor):
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
+        require_initialized_repo(self.repo)
         r = self.parser.parse_args(args)
-        self.index.commit(r.m)
+        self.repo.index.commit(r.m)

@@ -3,16 +3,17 @@
 import argparse
 import sys
 from typing import List
-
-from vc.prots import PCommandProcessor, PObjectDB
+from .util import require_initialized_repo
+from .prots import PCommandProcessor, PRepo
 
 
 class HashObjectCommand(PCommandProcessor):
     """Implementation of the hash-object command."""
 
     key = "hash-object"
+    repo: PRepo
 
-    def __init__(self, db: PObjectDB):
+    def __init__(self, repo: PRepo):
         """Initialize object, preparing the parser."""
         parser = argparse.ArgumentParser(
             description="Calculate hash and, optionally, write objects to DB"
@@ -25,10 +26,11 @@ class HashObjectCommand(PCommandProcessor):
             "file", type=str, nargs="?", help="name of the file to read from"
         )
         self.parser = parser
-        self.db = db
+        self.repo = repo
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
+        require_initialized_repo(self.repo)
         r = self.parser.parse_args(args)
 
         fil = r.file
@@ -49,6 +51,6 @@ class HashObjectCommand(PCommandProcessor):
                 content = f.read()
 
         if r.w:
-            print(self.db.put(content))
+            print(self.repo.db.put(content))
         else:
-            print(self.db.calculate_key(content))
+            print(self.repo.db.calculate_key(content))

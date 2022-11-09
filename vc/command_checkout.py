@@ -4,10 +4,9 @@
 
 import sys
 import argparse
-
 from typing import List
-
-from vc.prots import PRepo, PCommandProcessor
+from .prots import PRepo, PCommandProcessor
+from .util import require_initialized_repo
 
 
 class CheckoutCommand(PCommandProcessor):
@@ -19,7 +18,6 @@ class CheckoutCommand(PCommandProcessor):
     def __init__(self, repo: PRepo):
         """Initialize the repo."""
         self.repo = repo
-
         parser = argparse.ArgumentParser()
         parser.add_argument("commit_id", nargs=1)
         try:
@@ -29,11 +27,11 @@ class CheckoutCommand(PCommandProcessor):
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
+        require_initialized_repo(self.repo)
         r = self.parser.parse_args(args)
         if r.__contains__("h"):
             self.parser.print_help(sys.stderr)
             return
-
         try:
             message: str = self.repo.checkout(r.commit_id[0])
             _print_success(r.commit_id[0], message)

@@ -3,10 +3,9 @@
 
 import sys
 import argparse
-
 from typing import List
-
-from vc.prots import PCommandProcessor, PRepo, RepoStatus, FileWithStatus
+from .prots import PCommandProcessor, PRepo, RepoStatus, FileWithStatus
+from .util import require_initialized_repo
 
 
 class StatusCommand(PCommandProcessor):
@@ -29,6 +28,7 @@ class StatusCommand(PCommandProcessor):
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
         # FIXME: implement option to specify files
+        require_initialized_repo(self.repo)
         r = self.parser.parse_args(args)
         if r.__contains__("h"):
             self.parser.print_help(sys.stderr)

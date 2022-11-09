@@ -6,7 +6,7 @@ import os.path
 from itertools import dropwhile
 from dataclasses import dataclass
 from typing import List, Optional, Callable
-from vc.prots import (
+from ..prots import (
     PRepo,
     RepoStatus,
     PIndex,
@@ -23,23 +23,23 @@ from vc.prots import (
 class Repo(PRepo):
     """Represent a repository."""
 
-    index: PIndex
-    db: PObjectDB
+    _index: PIndex
+    _db: PObjectDB
     root: str
 
     def __init__(self, index: PIndex, db: PObjectDB, root: str):
         """Initialize the index and db."""
-        self.index = index
-        self.db = db
+        self._index = index
+        self._db = db
         self.root = root
 
     def status(self) -> RepoStatus:
         """Calculate and return the status of the repo."""
-        return _status(self.index, self.db, self.root)
+        return _status(self._index, self._db, self.root)
 
     def log(self) -> List[str]:  # FIXME: use a data structure
         """Return the log entries for the current HEAD."""
-        return _log(self.db, self.root)
+        return _log(self._db, self.root)
 
     def checkout(self, commit_id) -> str:
         """Checkout the commit and return its short message.
@@ -47,7 +47,21 @@ class Repo(PRepo):
         Any errors are thrown as an exception, with a message ready to
         be shown to the end user.
         """
-        return _checkout(self.index, self.db, self.root, commit_id)
+        return _checkout(self._index, self._db, self.root, commit_id)
+
+    def initialized(self) -> bool:
+        """Check whether the repo has been initialized or not."""
+        return self.root is not None and os.path.exists(self.root)
+
+    @property
+    def db(self) -> PObjectDB:
+        """Return the db used by this repo."""
+        return self._db
+
+    @property
+    def index(self) -> PIndex:
+        """Return the index used by this repo."""
+        return self._index
 
 
 @dataclass

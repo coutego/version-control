@@ -1,8 +1,8 @@
 """'init' command."""
 from typing import List
 
-from vc.prots import PCommandProcessor
-from vc.impl.fs import create_vc_root_dir, find_vc_root_dir
+from .prots import PCommandProcessor
+from .impl.fs import create_vc_root_dir, find_vc_root_dir
 
 
 class InitCommand(PCommandProcessor):

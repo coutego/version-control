@@ -5,7 +5,6 @@ import os
 from unittest import TestCase
 from vc.prots import PObjectDB, PRepo, PIndex
 from vc.impl.db import DB
-from vc.impl.fs import create_vc_root_dir
 from vc.impl.repo import Repo
 from vc.impl.index import Index
 
