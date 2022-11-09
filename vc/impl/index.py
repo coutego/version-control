@@ -81,7 +81,7 @@ class Index(PIndex):
             pn.append(IndexEntry("", "d", d))
         return _save_to_db_node("", raw_tree, self.db)
 
-    def commit(self, message: str = None) -> str:
+    def commit(self, message: Optional[str] = None) -> str:
         """Commit the current index, returning the commit hash."""
         if message is None:
             message = "<no commit message>"

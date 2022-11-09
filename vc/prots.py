@@ -162,7 +162,7 @@ class PIndex(Protocol):
     def save_to_db(self) -> str:
         """Save the Index to the DB, returning the key of the saved object."""
 
-    def commit(self, message: str = None) -> str:
+    def commit(self, message: Optional[str] = None) -> str:
         """Commit this index, returning the hash of the commit."""
 
     def dirtree(self) -> DirDict:

@@ -369,7 +369,7 @@ def _read_head_hash(root: str) -> str:
         return f.read().strip()  # FIXME: follow references
 
 
-def _read_db_tree(db: PObjectDB, key: str, acc: DirDict = None) -> DirDict:
+def _read_db_tree(db: PObjectDB, key: str, acc: Optional[DirDict] = None) -> DirDict:
     """Read a tree object from the DB, recursively building the associated DirDict."""
     if acc is None:
         acc = DirDict()
