@@ -41,7 +41,7 @@ class CatFileCommand(PCommandProcessor):
             if ob:
                 return
             else:
-                print("Object doesn't exist", file=sys.stderr)  # FIXME Check spec
+                print(f"fatal: Not a valid object name {hsh}", file=sys.stderr)
                 return
         if ob is None:
             print(f"fatal: Not a valid object name {hsh}", file=sys.stderr)
