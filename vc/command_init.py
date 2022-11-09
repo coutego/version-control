@@ -1,4 +1,5 @@
 """'init' command."""
+
 from typing import List
 
 from .prots import PCommandProcessor

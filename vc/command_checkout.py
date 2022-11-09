@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """'checkout' command."""
 
 import sys
