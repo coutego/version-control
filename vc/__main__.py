@@ -48,7 +48,8 @@ class MainCommandProcessor(PCommandProcessor):
         """Process the command with the given args."""
         if len(args) < 2:
             print(
-                f"Command required. Available commands: {', '.join(self.processors.keys())}",
+                "Command required. Available commands:"
+                + " {', '.join(self.processors.keys())}",
                 file=sys.stderr,
             )
             exit(-1)
@@ -57,7 +58,8 @@ class MainCommandProcessor(PCommandProcessor):
 
         if cmd not in self.processors.keys():
             print(
-                f"Command '{cmd}' not implemented. Available commands: {', '.join(self.processors.keys())}",
+                f"Command '{cmd}' not implemented. Available commands:"
+                + " {', '.join(self.processors.keys())}",
                 file=sys.stderr,
             )
             exit(-1)
