@@ -433,7 +433,8 @@ def _checkout(index: PIndex, db: PObjectDB, root: str, commit_id: str) -> str:
     de = _dirty_entries_in_index(index, db, root)
     if de:
         raise Exception(
-            "error: Your local changes to the following files would be overwritten by checkout:\n"
+            "error: Your local changes to the following files would be "
+            + "overwritten by checkout:\n"
             + "       "
             + ", ".join([f for f in de])
             + "\n"
