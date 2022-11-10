@@ -10,7 +10,6 @@ from .util import require_initialized_repo
 class CheckoutCommand(PCommandProcessor):
     """Implementation of the 'checkout' command."""
 
-    key = "checkout"
     repo: PRepo
 
     def __init__(self, repo: PRepo):
@@ -22,6 +21,10 @@ class CheckoutCommand(PCommandProcessor):
             self.parser = parser
         except Exception:
             parser.print_help(sys.stderr)
+
+    @property
+    def key(self):
+        return "checkout"
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""

@@ -335,7 +335,7 @@ def _add_tree_entries(d: DirName, key: str, db: PObjectDB, ret: DirDict) -> DirD
 
 
 def _build_working_dict(
-    dirs: List[DirName], ignorefn: Callable[[str], bool] = lambda x: False
+    dirs: List[DirName], ignorefn: Callable[[str], bool] = lambda _: False
 ) -> DirDict:
     """Build the DirDict for the working dir, only taking into account entries in 'dirs'."""
     ret = DirDict()
@@ -444,7 +444,7 @@ def _checkout(index: PIndex, db: PObjectDB, root: str, commit_id: str) -> str:
             + "Aborting"
         )
     commit_dict = _add_tree_entries(root, commit.tree_id, db, DirDict())
-    for k, fs in commit_dict.items():
+    for _, fs in commit_dict.items():
         for f in fs:
             if not f.etype == "f":
                 continue

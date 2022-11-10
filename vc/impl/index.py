@@ -2,7 +2,7 @@
 
 import os.path
 
-from typing import Dict, Optional, List, Set
+from typing import Dict, Optional, List, Set, Optional
 from ..prots import (
     PIndex,
     PObjectDB,
@@ -22,10 +22,10 @@ class Index(PIndex):
     db: PObjectDB
     root: str
 
-    def __init__(self, db: PObjectDB, root: str):
+    def __init__(self, db: PObjectDB, root: Optional[str]):
         """Initialize the object."""
         self.db = db
-        self.root = root
+        self.root = root or ""
 
     def stage_file(self, fil_or_dir: str) -> None:
         """Stage the given file or directory to the index file.
@@ -50,6 +50,7 @@ class Index(PIndex):
 
     def unstage_file(self, fil: str):
         """Unstages the file, from the file, reverting it to the previous state."""
+        raise NotImplemented
 
     def remove_file(self, fil: str):
         """Remove the file from the index, making it not tracked."""
@@ -77,6 +78,8 @@ class Index(PIndex):
             p = _parent_dir(d)
             if d == p:
                 continue
+            if p is None:
+                break
             pn = raw_tree[p]
             pn.append(IndexEntry("", "d", d))
         return _save_to_db_node("", raw_tree, self.db)
@@ -218,10 +221,6 @@ def _read_index_from_dirdict(dd: DirDict) -> Dict[str, IndexEntry]:
 
 def _direntry_to_indexentry(f: DirEntry):
     return IndexEntry(f.ehash, "f", f.ename)
-
-
-def _keyf_dir(e: IndexEntry) -> str:
-    return os.path.dirname(e.name)
 
 
 def _build_tree(idx: Dict[str, IndexEntry]):

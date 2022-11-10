@@ -10,7 +10,6 @@ from .util import require_initialized_repo
 class CatFileCommand(PCommandProcessor):
     """Implementation of the cat-file command."""
 
-    key = "cat-file"
     repo: PRepo
 
     def __init__(self, repo: PRepo):
@@ -27,6 +26,10 @@ class CatFileCommand(PCommandProcessor):
         parser.add_argument("hash", type=str)
         self.parser = parser
         self.repo = repo
+
+    @property
+    def key(self):
+        return "cat-file"
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""

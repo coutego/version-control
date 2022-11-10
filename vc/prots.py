@@ -17,15 +17,12 @@ DirName = str  # ex. 'src/module'
 Key = str  # Hash
 Branch = str  # Hash representing a branch
 
-FileStatus = Enum(
-    "FileStatus",
-    [
-        ("NEW", "new file"),
-        ("MODIFIED", "modified"),
-        ("DELETED", "deleted"),
-        ("RENAMED", "renamed"),
-    ],
-)
+
+class FileStatus(Enum):
+    NEW = "new file"
+    MODIFIED = "modified"
+    DELETED = "deleted"
+    RENAMED = "renamed"
 
 
 @dataclass
@@ -116,18 +113,22 @@ class PObjectDB(Protocol):
         Return the object key if succesful (either new entry created or
         an existing one found).
         """
+        ...
 
     def calculate_key(self, content: bytes):
         """Calculate the key for a given contents, same as in 'put'."""
+        ...
 
     def get(self, key: str) -> DBObject:
         """Get the contents associated with a key.
 
         Return the db object or raise a FileNotFoundError if not found.
         """
+        ...
 
     def get_full_key(self, commit_id: str) -> str:
         """Return the full key from a partial key."""
+        ...
 
 
 #####################################
@@ -155,24 +156,31 @@ class PIndex(Protocol):
         If the file has already been added, the entry is updated.
         If the file has not been added, add it.
         """
+        ...
 
     def unstage_file(self, fil: str):
         """Unstages the file, from the file, reverting it to the previous state."""
+        ...
 
     def remove_file(self, fil: str):
         """Remove the file from the index, making it not tracked."""
+        ...
 
     def save_to_db(self) -> str:
         """Save the Index to the DB, returning the key of the saved object."""
+        ...
 
     def commit(self, message: Optional[str] = None) -> str:
         """Commit this index, returning the hash of the commit."""
+        ...
 
     def dirtree(self) -> DirDict:
         """Return the representation of the stage area as a DirTree."""
+        ...
 
     def set_to_dirtree(self, dd: DirDict) -> None:
         """Make the index correspond to the passed dd."""
+        ...
 
 
 #####################################
@@ -203,9 +211,11 @@ class PRepo(Protocol):
 
     def status(self) -> RepoStatus:
         """Calculate and return the status of the repo."""
+        ...
 
     def log(self) -> List[LogEntry]:
         """Return the log entries for the current HEAD."""
+        ...
 
     def checkout(self, commit_id) -> str:
         """Checkout the commit and return its short message.
@@ -213,17 +223,21 @@ class PRepo(Protocol):
         Any errors are thrown as an exception, with a message ready to
         be shown to the end user.
         """
+        ...
 
     def initialized(self) -> bool:
         """Check whether the repo has been initialized or not."""
+        ...
 
     @property
     def db(self) -> PObjectDB:
         """Return the db used by this repo."""
+        ...
 
     @property
     def index(self) -> PIndex:
         """Return the index used by this repo."""
+        ...
 
 
 #####################################
@@ -235,6 +249,8 @@ class PCommandProcessor(Protocol):
     @property
     def key(self) -> str:
         """Return the key of this command."""
+        ...
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
+        ...

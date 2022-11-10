@@ -10,7 +10,6 @@ from .util import require_initialized_repo
 class CommitCommand(PCommandProcessor):
     """Implementation of the 'commit' command."""
 
-    key = "commit"
     repo: PRepo
 
     def __init__(self, repo: PRepo):
@@ -23,6 +22,10 @@ class CommitCommand(PCommandProcessor):
             self.parser = parser
         except Exception:
             parser.print_help(sys.stderr)
+
+    @property
+    def key(self):
+        return "commit"
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""

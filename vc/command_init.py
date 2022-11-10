@@ -9,7 +9,9 @@ from .impl.fs import create_vc_root_dir, find_vc_root_dir
 class InitCommand(PCommandProcessor):
     """Implementation of the cat-file command."""
 
-    key = "init"
+    @property
+    def key(self):
+        return "init"
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""

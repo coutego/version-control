@@ -23,33 +23,38 @@ class MainCommandProcessor(PCommandProcessor):
     """Main CommandProcessor."""
 
     processors: Dict[str, PCommandProcessor] = {}
-    key = ""
 
     def __init__(self):
         """Build the object tree."""
         root = find_vc_root_dir()
-        db = DB(root)
-        index = Index(db, root)
-        repo = Repo(index, db, root)
         procs = []
-        procs.append(HashObjectCommand(repo))
-        procs.append(CatFileCommand(repo))
-        procs.append(InitCommand())
-        procs.append(AddCommand(repo))
-        procs.append(CommitCommand(repo))
-        procs.append(StatusCommand(repo))
-        procs.append(LogCommand(repo))
-        procs.append(CheckoutCommand(repo))
+        if root is None:
+            procs.append(InitCommand())
+        else:
+            db = DB(root)
+            index = Index(db, root)
+            repo = Repo(index, db, root)
+            procs.append(HashObjectCommand(repo))
+            procs.append(CatFileCommand(repo))
+            procs.append(AddCommand(repo))
+            procs.append(CommitCommand(repo))
+            procs.append(StatusCommand(repo))
+            procs.append(LogCommand(repo))
+            procs.append(CheckoutCommand(repo))
 
         for p in procs:
             self.processors[p.key] = p
+
+    @property
+    def key(self):
+        return ""
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
         if len(args) < 2:
             print(
                 "Command required. Available commands:"
-                + " {', '.join(self.processors.keys())}",
+                + f" {', '.join(self.processors.keys())}",
                 file=sys.stderr,
             )
             exit(-1)

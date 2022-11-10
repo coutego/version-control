@@ -10,7 +10,6 @@ from .prots import PCommandProcessor, PRepo
 class HashObjectCommand(PCommandProcessor):
     """Implementation of the hash-object command."""
 
-    key = "hash-object"
     repo: PRepo
 
     def __init__(self, repo: PRepo):
@@ -27,6 +26,10 @@ class HashObjectCommand(PCommandProcessor):
         )
         self.parser = parser
         self.repo = repo
+
+    @property
+    def key(self):
+        return "hash-object"
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""

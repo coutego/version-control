@@ -10,11 +10,9 @@ from .util import require_initialized_repo
 class LogCommand(PCommandProcessor):
     """Implementation of the 'log' command."""
 
-    key = "log"
     repo: PRepo
 
     def __init__(self, repo: PRepo):
-        """Initialize the repo."""
         self.repo = repo
 
         parser = argparse.ArgumentParser()
@@ -24,6 +22,10 @@ class LogCommand(PCommandProcessor):
             self.parser = parser
         except Exception:
             parser.print_help(sys.stderr)
+
+    @property
+    def key(self):
+        return "log"
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""

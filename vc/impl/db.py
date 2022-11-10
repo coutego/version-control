@@ -32,6 +32,7 @@ class DB(PObjectDB):
         self, content: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB
     ) -> DBObjectKey:
         """Associate the content bb to the key."""
+        # FIXME: write (and read...) the type of the object
         self._check_repo()
         key, bcontent = _prepare_to_save(content)
         lfname, ldirs, _ = self._filename_from_key(key)
@@ -93,10 +94,10 @@ def _prepare_to_save(
     content: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB
 ) -> Tuple[DBObjectKey, bytes]:
     # FIXME: this compression doesn't match git results: look into that
-    bs: bytes
-    if type(content) == bytes:
+    bs: bytes = b""
+    if type(content) is bytes:
         bs = content
-    elif type(content) == str:
+    elif type(content) is str:
         bs = content.encode("UTF-8")
     s = f"{typ.name.lower()} {len(bs)}\0"
     bcontent = s.encode("UTF-8") + bs

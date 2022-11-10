@@ -9,7 +9,6 @@ from .util import require_initialized_repo
 class AddCommand(PCommandProcessor):
     """Implementation of the add command."""
 
-    key = "add"
     repo: PRepo
 
     def __init__(self, repo: PRepo):
@@ -18,6 +17,10 @@ class AddCommand(PCommandProcessor):
         parser = argparse.ArgumentParser()
         parser.add_argument("files", type=str, nargs="*")
         self.parser = parser
+
+    @property
+    def key(self):
+        return "add"
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
