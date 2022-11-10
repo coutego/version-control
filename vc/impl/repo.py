@@ -441,11 +441,24 @@ def _checkout(index: PIndex, db: PObjectDB, root: str, commit_id: str) -> str:
             + "Please commit your changes or stash them before you switch branches.\n"
             + "Aborting"
         )
+    commit_dict = _add_tree_entries(root, commit.tree_id, db, DirDict())
+    for k, fs in commit_dict.items():
+        for f in fs:
+            if not f.etype == "f":
+                continue
+            contents = db.get(f.ehash).contents
+            with open(f.ename, "wb") as ff:
+                ff.write(contents)
+    with open(root + "/HEAD", "w") as head:
+        head.write(commit_id)
+    index.set_to_dirtree(commit_dict)
+
     return commit.comment.splitlines()[0]
 
 
 def _dirty_entries_in_index(index: PIndex, db: PObjectDB, root: str) -> List[FileName]:
     """Return the list of entries which are 'dirty' (different than in HEAD)."""
+    # FIXME: BUG: The head_dict is not being used, so this implementation must be wrong
     ret: List[FileName] = []
     tree = index.dirtree()
     head_dict = _build_head_dict(db, root)

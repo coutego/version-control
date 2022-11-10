@@ -111,6 +111,11 @@ class Index(PIndex):
                 ret[k].append(DirEntry(FileName(e.name), FileType(e.type), Key(e.key)))
         return ret
 
+    def set_to_dirtree(self, dd: DirDict) -> None:
+        """Make the index correspond to the passed dd."""
+        idx = _read_index_from_dirdict(dd)
+        _write_index_to_file(idx, self.root + "/index")
+
 
 def _all_dirs_in_index(raw_tree: Dict[str, List[IndexEntry]]) -> Set[str]:
     dirs = set("")
@@ -200,6 +205,19 @@ def _read_index_from_file(filename: str) -> Dict[str, IndexEntry]:
             return ret
     except Exception:
         return {}
+
+
+def _read_index_from_dirdict(dd: DirDict) -> Dict[str, IndexEntry]:
+    ret: Dict[str, IndexEntry] = {}
+    for d, fs in dd.items():
+        for f in fs:
+            en = _direntry_to_indexentry(f)
+            ret[f.ename] = en
+    return ret
+
+
+def _direntry_to_indexentry(f: DirEntry):
+    return IndexEntry(f.ehash, "f", f.ename)
 
 
 def _keyf_dir(e: IndexEntry) -> str:

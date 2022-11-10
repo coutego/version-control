@@ -168,6 +168,9 @@ class PIndex(Protocol):
     def dirtree(self) -> DirDict:
         """Return the representation of the stage area as a DirTree."""
 
+    def set_to_dirtree(self, dd: DirDict) -> None:
+        """Make the index correspond to the passed dd."""
+
 
 #####################################
 # Repository
