@@ -50,7 +50,7 @@ class Index(PIndex):
 
     def unstage_file(self, fil: str):
         """Unstages the file, from the file, reverting it to the previous state."""
-        raise NotImplemented
+        raise NotImplemented(fil)
 
     def remove_file(self, fil: str):
         """Remove the file from the index, making it not tracked."""
@@ -212,7 +212,7 @@ def _read_index_from_file(filename: str) -> Dict[str, IndexEntry]:
 
 def _read_index_from_dirdict(dd: DirDict) -> Dict[str, IndexEntry]:
     ret: Dict[str, IndexEntry] = {}
-    for d, fs in dd.items():
+    for _, fs in dd.items():
         for f in fs:
             en = _direntry_to_indexentry(f)
             ret[f.ename] = en
@@ -226,7 +226,7 @@ def _direntry_to_indexentry(f: DirEntry):
 def _build_tree(idx: Dict[str, IndexEntry]):
     ret: Dict[str, list] = {}
     for e in idx.values():
-        k, t, n = e
+        _, _, n = e
         d = os.path.dirname(n)
         if not ret.get(d):
             ret[d] = []

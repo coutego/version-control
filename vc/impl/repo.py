@@ -249,13 +249,13 @@ def _add_file_to_repostatus(
             rs.staged.append(FileWithStatus(f, FileStatus.NEW))
         else:
             rs.staged.append(FileWithStatus(f, FileStatus.MODIFIED))
-    if _file_is_modified_in_working_tree(f, work_dict, stag_dict, db):
+    if _file_is_modified_in_working_tree(f, stag_dict, db):
         rs.not_staged.append(FileWithStatus(f, FileStatus.MODIFIED))
     return rs
 
 
 def _file_is_modified_in_working_tree(
-    f: FilePath, work_dict: DirDict, stag_dict: DirDict, db: PObjectDB
+    f: FilePath, stag_dict: DirDict, db: PObjectDB
 ) -> bool:
     """Return True is f is modified in the working tree, with respect to the index."""
     if f == "" or os.path.isdir(f):
@@ -432,7 +432,7 @@ def _checkout(index: PIndex, db: PObjectDB, root: str, commit_id: str) -> str:
             f"error: pathspec '{commit_id}' did not match any file(s) known to vc"
         )
 
-    de = _dirty_entries_in_index(index, db, root)
+    de = _dirty_entries_in_index(index, db)
     if de:
         raise Exception(
             "error: Your local changes to the following files would be "
@@ -459,20 +459,18 @@ def _checkout(index: PIndex, db: PObjectDB, root: str, commit_id: str) -> str:
     return commit.comment.splitlines()[0]
 
 
-def _dirty_entries_in_index(index: PIndex, db: PObjectDB, root: str) -> List[FileName]:
-    """Return the list of entries which are 'dirty' (different than in HEAD)."""
-    # FIXME: BUG: The head_dict is not being used, so this implementation must be wrong
+def _dirty_entries_in_index(index: PIndex, db: PObjectDB) -> List[FileName]:
+    """Return the list of entries which are 'dirty' (different than in work dir)."""
     ret: List[FileName] = []
     tree = index.dirtree()
-    head_dict = _build_head_dict(db, root)
     for d in tree.keys():
         for f in tree[d]:
-            if _is_dirty_in_index(f, db, head_dict):
+            if _is_dirty_in_index(f, db):
                 ret.append(f.ename)
     return ret
 
 
-def _is_dirty_in_index(f: DirEntry, db: PObjectDB, head_dict: DirDict) -> bool:
+def _is_dirty_in_index(f: DirEntry, db: PObjectDB) -> bool:
     with open(f.ename, "rb") as ff:
         hsh = db.calculate_key(ff.read())
     if f.ehash == hsh:

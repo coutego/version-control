@@ -13,7 +13,7 @@ class InitCommand(PCommandProcessor):
     def key(self):
         return "init"
 
-    def process_command(self, args: List[str]) -> None:
+    def process_command(self, _: List[str]) -> None:
         """Process the command with the given args."""
         if find_vc_root_dir():
             print("Already on a repository. Aborting")

@@ -24,7 +24,7 @@ class DBTest(TestCase):
         with self.assertRaises(FileNotFoundError):
             db.get("I dont exist")
         with self.assertRaises(FileNotFoundError):
-            db.get(None)
+            db.get(None)  # type: ignore
 
     def test_basic_save(self):
         db = self.db
@@ -34,19 +34,21 @@ class DBTest(TestCase):
         self.assertEqual(c, ob)
 
     def test_incorrect_root(self):
-        DB(None)
+        DB(None)  # type: ignore
         with self.assertRaises(FileNotFoundError):
             DB("i dont exist sldkfjsdlkfjds")
 
     def test_incorrect_key(self):
         db = self.db
         with self.assertRaises(FileNotFoundError):
-            db.get(None)
+            db.get(None)  # type: ignore
+
         with self.assertRaises(FileNotFoundError):
             db.get("")
 
     def test_none_root(self):
-        db = DB(None)
+        db = DB(None)  # type: ignore
+
         with self.assertRaises(FileNotFoundError):
             db.calculate_key("abc")
 

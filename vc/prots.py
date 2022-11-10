@@ -50,7 +50,7 @@ class DirDict(Dict[DirName, List[DirEntry]]):
 
     def contains_file(self, f: FileName) -> bool:
         """Return True is the DirTree contains the given file."""
-        for k, fs in self.items():
+        for _, fs in self.items():
             if f in [fl.ename for fl in fs]:
                 return True
         return False
@@ -66,7 +66,7 @@ class DirDict(Dict[DirName, List[DirEntry]]):
 
     def find_entry(self, f: FileName) -> Optional[DirEntry]:
         """Find the entry for the given filename and return it."""
-        for k, fs in self.items():
+        for _, fs in self.items():
             for fl in fs:
                 if fl.ename == f:
                     return fl
