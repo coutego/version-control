@@ -76,6 +76,18 @@ class DB(PObjectDB):
         if self.root is None or not os.path.isdir(self.root):
             raise FileNotFoundError("Not in a repo")
 
+    def get_full_key(self, key: str) -> str:
+        """Return the full key from a partial key."""
+        self._check_repo()
+        if key is None or key.strip() == "":
+            raise FileNotFoundError("Empty key")
+        lfname, _, _ = self._filename_from_key(key)
+        files = glob.glob(lfname + "*")
+        if len(files) != 1:
+            raise FileNotFoundError("Object not found")
+        f = files[0]
+        return "".join(f.split("/")[-2:])
+
 
 def _prepare_to_save(
     content: Union[bytes, str], typ: DBObjectType = DBObjectType.BLOB

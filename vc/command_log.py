@@ -36,4 +36,4 @@ class LogCommand(PCommandProcessor):
 
         log = self.repo.log()
         for le in log:
-            print(le)
+            print(f"{le.key[0:6]} {le.comment}")

@@ -54,9 +54,11 @@ class CheckoutTest(TestCase):
         self.repo.checkout(c1)
         with open(f1, "r") as f:
             self.assertEqual(f.read(), "abc")
-        self.repo.checkout(c2)
+        self.repo.checkout(c2[:6])  # Check that the commit ids are fully recovered
         with open(f1, "r") as f:
             self.assertEqual(f.read(), "abcdef")
+        log = self.repo.log()
+        self.assertEqual(c2, log[0].key)
 
     def create_file(self, rel_root: str, contents: str) -> str:
         fn = self.rootdir + "/" + rel_root

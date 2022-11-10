@@ -126,6 +126,9 @@ class PObjectDB(Protocol):
         Return the db object or raise a FileNotFoundError if not found.
         """
 
+    def get_full_key(self, commit_id: str) -> str:
+        """Return the full key from a partial key."""
+
 
 #####################################
 # Index (staging area)
@@ -187,13 +190,21 @@ class RepoStatus:
     staged: List[FileWithStatus]
 
 
+@dataclass
+class LogEntry:
+    """Represent an entry in the 'log'."""
+
+    key: str
+    comment: str
+
+
 class PRepo(Protocol):
     """Represent a repository."""
 
     def status(self) -> RepoStatus:
         """Calculate and return the status of the repo."""
 
-    def log(self) -> List[str]:  # FIXME: use a data structure
+    def log(self) -> List[LogEntry]:
         """Return the log entries for the current HEAD."""
 
     def checkout(self, commit_id) -> str:

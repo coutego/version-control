@@ -50,6 +50,12 @@ class DBTest(TestCase):
         with self.assertRaises(FileNotFoundError):
             db.calculate_key("abc")
 
+    def test_full_key(self):
+        db = self.db
+        key = db.put("abc")
+        rkey = db.get_full_key(key[:6])
+        self.assertEqual(key, rkey)
+
 
 if __name__ == "__main__":
     unittest.main()

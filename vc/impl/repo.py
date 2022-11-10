@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Callable
 from ..prots import (
     PRepo,
+    LogEntry,
     RepoStatus,
     PIndex,
     PObjectDB,
@@ -37,7 +38,7 @@ class Repo(PRepo):
         """Calculate and return the status of the repo."""
         return _status(self._index, self._db, self.root)
 
-    def log(self) -> List[str]:  # FIXME: use a data structure
+    def log(self) -> List[LogEntry]:
         """Return the log entries for the current HEAD."""
         return _log(self._db, self.root)
 
@@ -407,15 +408,15 @@ def _matches(patterns: List[str], s: str) -> bool:
     return False
 
 
-def _log(db: PObjectDB, root: str) -> List[str]:  # FIXME: use a data structure
+def _log(db: PObjectDB, root: str) -> List[LogEntry]:
     """Return the log entries for the current HEAD."""
-    ret: List[str] = []
+    ret: List[LogEntry] = []
     chash: Optional[str] = _read_head_hash(root)
     while chash:
         commit = Commit.from_hash(chash, db)
         if commit is None:
             return ret
-        ret.append(f"{chash[:7]} {commit.short_comment}")
+        ret.append(LogEntry(chash, commit.short_comment))
         if commit.parents and len(commit.parents) > 0:
             chash = commit.parents[0]
         else:
@@ -425,6 +426,7 @@ def _log(db: PObjectDB, root: str) -> List[str]:  # FIXME: use a data structure
 
 def _checkout(index: PIndex, db: PObjectDB, root: str, commit_id: str) -> str:
     commit = Commit.from_hash(commit_id, db)
+    full_commit_hash = db.get_full_key(commit_id)
     if commit is None:
         raise Exception(
             f"error: pathspec '{commit_id}' did not match any file(s) known to vc"
@@ -450,7 +452,8 @@ def _checkout(index: PIndex, db: PObjectDB, root: str, commit_id: str) -> str:
             with open(f.ename, "wb") as ff:
                 ff.write(contents)
     with open(root + "/HEAD", "w") as head:
-        head.write(commit_id)
+        head.write(full_commit_hash)
+        # head.write(commit_id)  # FIXME: BUG: remove
     index.set_to_dirtree(commit_dict)
 
     return commit.comment.splitlines()[0]
