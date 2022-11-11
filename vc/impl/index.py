@@ -14,6 +14,7 @@ from ..prots import (
     FileType,
     FileName,
 )
+from .fs import head_read, head_write
 
 
 class Index(PIndex):
@@ -88,18 +89,11 @@ class Index(PIndex):
         """Commit the current index, returning the commit hash."""
         if message is None:
             message = "<no commit message>"
-        root = self.root
-        head = root + "/HEAD"
-        parent = ""
-
-        if os.path.exists(head):
-            with open(head, "r") as f:
-                parent = f.read()
+        parent = head_read(self.root)
 
         commit = _prepare_commit(self.save_to_db(), parent, message)
         nkey = self.db.put(commit)
-        with open(head, "w") as f:
-            f.write(f"{nkey}\n")
+        head_write(self.root, f"{nkey}\n")
         return nkey
 
     def dirtree(self) -> DirDict:

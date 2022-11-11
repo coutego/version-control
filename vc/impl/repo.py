@@ -19,7 +19,7 @@ from ..prots import (
     DirDict,
     FileName,
 )
-
+from .fs import head_read, head_write
 
 class Repo(PRepo):
     """Represent a repository."""
@@ -363,11 +363,7 @@ def _build_working_dict(
 
 def _read_head_hash(root: str) -> str:
     """Read and return the hash for the current HEAD."""
-    head = root + "/HEAD"
-    if not os.path.exists(head):
-        return ""
-    with open(head, "r") as f:
-        return f.read().strip()  # FIXME: follow references
+    return head_read(root).strip()  # FIXME: follow references
 
 
 def _read_db_tree(db: PObjectDB, key: str, acc: Optional[DirDict] = None) -> DirDict:
@@ -451,11 +447,8 @@ def _checkout(index: PIndex, db: PObjectDB, root: str, commit_id: str) -> str:
             contents = db.get(f.ehash).contents
             with open(f.ename, "wb") as ff:
                 ff.write(contents)
-    with open(root + "/HEAD", "w") as head:
-        head.write(full_commit_hash)
-        # head.write(commit_id)  # FIXME: BUG: remove
+    head_write(root, full_commit_hash)
     index.set_to_dirtree(commit_dict)
-
     return commit.comment.splitlines()[0]
 
 
