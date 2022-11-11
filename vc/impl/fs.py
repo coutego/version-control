@@ -20,7 +20,6 @@ def find_vc_root_dir(startdir=os.curdir) -> Optional[str]:
             return d  # Found it!
         prev = curr
         curr = prev + "/.."
-    return None  # Wasn't found
 
 
 def create_vc_root_dir(parent_dir=os.curdir) -> str:
