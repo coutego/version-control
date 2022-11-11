@@ -101,39 +101,40 @@ Untracked files:
 
 ** DONE Implement file-cat
 
-** DONE Implement init
+** DONE Implement init [1/1]
 - [X] Create the empty structure
 
 ** DONE Implement add [1/1]
 - [X] Decide how to implement the index / stage area
 
-** TODO Implement 'log'
+** TODO Implement 'log' [1/2]
 - [X] Only information as with option 'one-line'
 - [ ] Full information, no other option
 
-** TODO Implement 'status'
+** TODO Implement 'status' [1/2]
 - [X] Implement with no options, no files specified
 - [ ] Implement with files specified
 
-** TODO Implement 'diff'
+** TODO Implement 'diff' [0/2]
 - [ ] Implement with no options, no files specified
 - [ ] Implement with files specified
 
-** TODO Implement 'restore'
+** TODO Implement 'restore' [0/1]
 - [ ] vc restore --staged <file-name>
 
 ** TODO Implement 'commit' [1/2]
 - [X] Without branches
 - [ ] With author and committer
 
-** TODO Implement 'checkout'
-- [ ] From hash
+** TODO Implement 'checkout' [1/3]
+- [X] From hash
+- [ ] Implement deletion of files
 - [ ] From branch
 
-** TODO Implement branches
+** TODO Implement branches [0/2]
 - [ ] Change commit to use references
 - [ ] Check unchecked files will not be overwritten
 
-** TODO Implement merge
+** TODO Implement merge [0/2]
 - [ ] Only when no files have changed in both branches
 - [ ] Indicate just one big conflict for the whole file
