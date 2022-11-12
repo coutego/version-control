@@ -14,6 +14,7 @@ from .command_status import StatusCommand
 from .command_log import LogCommand
 from .command_checkout import CheckoutCommand
 from .command_branch import BranchCommand
+from .command_diff import DiffCommand
 from ..impl.fs import find_vc_root_dir
 from ..impl.db import DB
 from ..impl.index import Index
@@ -42,6 +43,7 @@ class MainCommandProcessor(PCommandProcessor):
             procs.append(LogCommand(repo))
             procs.append(CheckoutCommand(repo))
             procs.append(BranchCommand(repo))
+            procs.append(DiffCommand(repo))
 
         for p in procs:
             self.processors[p.key] = p

@@ -21,6 +21,9 @@
 - [ ] Implement with files specified
 
 ** TODO Implement 'diff' [0/2]
+:LOGBOOK:
+CLOCK: [2022-11-12 Sat 23:07]
+:END:
 - [ ] Implement with no options, no files specified
   - [ ] For worktree vs HEAD
   - [ ] For worktree vs arbitrary

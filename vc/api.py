@@ -247,6 +247,14 @@ class PRepo(Protocol):
         """List the existing branches.."""
         ...
 
+    def diff(self, files: List[str]) -> List[str]:
+        """Calculates the diff for the given list of files.
+
+        If the list is empty, provide the diff for all files.
+        By default, the diff is between the file in the workdir and the head.
+        """
+        ...
+
     @property
     def db(self) -> PObjectDB:
         """Return the db used by this repo."""
