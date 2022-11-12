@@ -1,6 +1,50 @@
 #+title: Todo
 #+TODO: TODO(t) MAYBE(m) | DONE(d) CANCELLED(c)
 
+* Functionality
+** DONE Make DB to use the hasher through a protocol instead of hardcoding it
+
+** DONE Implement file-cat
+
+** DONE Implement init [1/1]
+- [X] Create the empty structure
+
+** DONE Implement add [1/1]
+- [X] Decide how to implement the index / stage area
+
+** TODO Implement 'log' [1/2]
+- [X] Only information as with option 'one-line'
+- [ ] Full information, no other option
+
+** TODO Implement 'status' [1/2]
+- [X] Implement with no options, no files specified
+- [ ] Implement with files specified
+
+** TODO Implement 'diff' [0/2]
+- [ ] Implement with no options, no files specified
+  - [ ] For worktree vs HEAD
+  - [ ] For worktree vs arbitrary
+- [ ] Implement with files specified
+
+** TODO Implement 'restore' [0/1]
+- [ ] vc restore --staged <file-name>
+
+** TODO Implement 'commit' [1/2]
+- [X] Without branches
+- [ ] With author and committer
+
+** TODO Implement 'checkout' [2/3]
+- [X] From hash
+- [X] From branch
+- [ ] Implement deletion of files
+
+** TODO Implement branches [1/2]
+- [X] Change commit to use references
+- [ ] Check unchecked files will not be overwritten
+
+** TODO Implement merge [0/2]
+- [ ] Only when no files have changed in both branches
+- [ ] Indicate just one big conflict for the whole file
 * Bugfixes
 ** TODO Make 'status' on empty branch show files in root dir
 *** Sample
@@ -96,47 +140,3 @@ Untracked files:
   (use "git add <file>..." to include in what will be committed)
         .vc/
         README.org
-* Functionality
-** DONE Make DB to use the hasher through a protocol instead of hardcoding it
-
-** DONE Implement file-cat
-
-** DONE Implement init [1/1]
-- [X] Create the empty structure
-
-** DONE Implement add [1/1]
-- [X] Decide how to implement the index / stage area
-
-** TODO Implement 'log' [1/2]
-- [X] Only information as with option 'one-line'
-- [ ] Full information, no other option
-
-** TODO Implement 'status' [1/2]
-- [X] Implement with no options, no files specified
-- [ ] Implement with files specified
-
-** TODO Implement 'diff' [0/2]
-- [ ] Implement with no options, no files specified
-  - [ ] For worktree vs HEAD
-  - [ ] For worktree vs arbitrary
-- [ ] Implement with files specified
-
-** TODO Implement 'restore' [0/1]
-- [ ] vc restore --staged <file-name>
-
-** TODO Implement 'commit' [1/2]
-- [X] Without branches
-- [ ] With author and committer
-
-** TODO Implement 'checkout' [1/3]
-- [X] From hash
-- [ ] Implement deletion of files
-- [ ] From branch
-
-** TODO Implement branches [1/2]
-- [X] Change commit to use references
-- [ ] Check unchecked files will not be overwritten
-
-** TODO Implement merge [0/2]
-- [ ] Only when no files have changed in both branches
-- [ ] Indicate just one big conflict for the whole file

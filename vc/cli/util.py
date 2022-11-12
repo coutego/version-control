@@ -1,6 +1,6 @@
 """Utility functions."""
 
-from .api import PRepo
+from ..api import PRepo
 
 
 def require_initialized_repo(repo: PRepo):

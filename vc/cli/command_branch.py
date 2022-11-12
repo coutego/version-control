@@ -4,7 +4,7 @@ import sys
 import argparse
 from typing import List
 from ..api import PRepo, PCommandProcessor
-from ..util import require_initialized_repo
+from .util import require_initialized_repo
 
 
 class BranchCommand(PCommandProcessor):

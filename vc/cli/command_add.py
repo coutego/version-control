@@ -3,7 +3,7 @@
 import argparse
 from typing import List
 from ..api import PCommandProcessor, PRepo
-from ..util import require_initialized_repo
+from .util import require_initialized_repo
 
 
 class AddCommand(PCommandProcessor):
