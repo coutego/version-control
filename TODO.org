@@ -59,7 +59,10 @@ On branch *branches not implemented*
 Changes to be committed:
   (use "vc restore --staged <file>..." to unstage)
         new file: README.org
-** TODO vc init gives error if in a repo, but initializes anyway
+** DONE vc init gives error if in a repo, but initializes anyway
+:LOGBOOK:
+CLOCK: [2022-11-12 Sat 22:08]--[2022-11-12 Sat 22:16] =>  0:08
+:END:
 *** Sample
 coutego@laptop:~/tmp/bug-new$ vc init
 Already on a repository. Aborting

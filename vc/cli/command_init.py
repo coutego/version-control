@@ -1,7 +1,7 @@
 """'init' command."""
 
+import os
 from typing import List
-
 from ..impl.db import DB
 from ..impl.index import Index
 from ..impl.repo import Repo
@@ -18,9 +18,12 @@ class InitCommand(PCommandProcessor):
 
     def process_command(self, _: List[str]) -> None:
         """Process the command with the given args."""
-        if find_vc_root_dir():
-            print("Already on a repository. Aborting")
-        d = create_vc_root_dir()
+        try:
+            d = create_vc_root_dir()
+        except:
+            print(f"Reinitialized existing VC repository in {os.path.abspath(os.curdir)}")
+            # FIXME: do actually reinitialize it
+            exit(1)
         db = DB(d)
         index = Index(db, d)
         repo = Repo(index, db, d)
