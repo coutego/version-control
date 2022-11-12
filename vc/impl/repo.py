@@ -376,7 +376,7 @@ def _build_working_dict(
 ) -> DirDict:
     """Build the DirDict for the working dir, only taking into account entries in 'dirs'."""
     ret = DirDict()
-    for d in dirs:
+    for d in dirs + ['']:
         if d == "":
             dd = "."
         else:

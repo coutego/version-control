@@ -90,7 +90,7 @@ Untracked files:
         TODO.org
 ** TODO Make 'status' on empty branch show files in root dir
 :LOGBOOK:
-CLOCK: [2022-11-12 Sat 21:09]
+CLOCK: [2022-11-12 Sat 21:09]--[2022-11-12 Sat 21:24] =>  0:15
 :END:
 - test_detect_new_without_any_commit
 *** Sample
