@@ -88,7 +88,7 @@ Untracked files:
   (use "git add <file>..." to include in what will be committed)
         .vc/
         TODO.org
-** TODO Make 'status' on empty branch show files in root dir
+** DONE Make 'status' on empty branch show files in root dir
 :LOGBOOK:
 CLOCK: [2022-11-12 Sat 21:09]--[2022-11-12 Sat 21:24] =>  0:15
 :END:
