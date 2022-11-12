@@ -46,21 +46,22 @@
 - [ ] Only when no files have changed in both branches
 - [ ] Indicate just one big conflict for the whole file
 * Bugfixes
-** TODO Make 'status' on empty branch show files in root dir
+** TODO New bug: added and committed file stays as 'new'
 *** Sample
-############# vc #############
+coutego@laptop:~/tmp/bug-new$ vc add README.org
+coutego@laptop:~/tmp/bug-new$ vc commit -m 'add README'
+coutego@laptop:~/tmp/bug-new$ vc status
 On branch *branches not implemented*
-############# git #############
-On branch master
+Changes to be committed:
+  (use "vc restore --staged <file>..." to unstage)
+        new file: README.org
+** TODO vc init gives error if in a repo, but initializes anyway
+*** Sample
+coutego@laptop:~/tmp/bug-new$ vc init
+Already on a repository. Aborting
+Initialized empty VC repository in /home/pedro/tmp/bug-new/.vc
+coutego@laptop:~/tmp/bug-new$
 
-No commits yet
-
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-        README.org
-        TODO.org
-
-nothing added to commit but untracked files present (use "git add" to track)
 ** TODO Show dirs in 'status' with a trailing slash
 *** Sample
 ############# vc #############
@@ -87,6 +88,25 @@ Untracked files:
   (use "git add <file>..." to include in what will be committed)
         .vc/
         TODO.org
+** TODO Make 'status' on empty branch show files in root dir
+:LOGBOOK:
+CLOCK: [2022-11-12 Sat 21:09]
+:END:
+- test_detect_new_without_any_commit
+*** Sample
+############# vc #############
+On branch *branches not implemented*
+############# git #############
+On branch master
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        README.org
+        TODO.org
+
+nothing added to commit but untracked files present (use "git add" to track)
 ** MAYBE Show summary changes in 'commit'
 *** Sample
 ############# vc #############
