@@ -3,7 +3,7 @@ import shutil
 import os.path
 import os
 from unittest import TestCase
-from vc.prots import PObjectDB, PRepo, PIndex
+from vc.api import PObjectDB, PRepo, PIndex
 from vc.impl.db import DB
 from vc.impl.repo import Repo
 from vc.impl.index import Index

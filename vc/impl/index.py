@@ -3,7 +3,7 @@
 import os.path
 
 from typing import Dict, Optional, List, Set, Optional, Tuple
-from ..prots import (
+from ..api import (
     PIndex,
     PObjectDB,
     IndexEntry,

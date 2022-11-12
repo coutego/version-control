@@ -3,8 +3,8 @@
 import sys
 import argparse
 from typing import List
-from .prots import PCommandProcessor, PRepo
-from .util import require_initialized_repo
+from ..api import PCommandProcessor, PRepo
+from ..util import require_initialized_repo
 
 
 class LogCommand(PCommandProcessor):

@@ -22,7 +22,7 @@ so it's a nice way of killing two birds with one snake.
 * How
 The implementation is quite straigtforward, if not very refined.
 The main structure can be understood by having a look at the Protocols
-of the building blocks of the system, defined in cv/prots.py.
+of the building blocks of the system, defined in cv/api.py.
 
 * Usage
 Just download the repo, put it in some directory in your PYTHONPATH, which makes it possible to invoke it with 'python -m vc'.

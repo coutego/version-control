@@ -2,11 +2,11 @@
 
 from typing import List
 
-from .impl.db import DB
-from .impl.index import Index
-from .impl.repo import Repo
-from .prots import PCommandProcessor
-from .impl.fs import create_vc_root_dir, find_vc_root_dir
+from ..impl.db import DB
+from ..impl.index import Index
+from ..impl.repo import Repo
+from ..api import PCommandProcessor
+from ..impl.fs import create_vc_root_dir, find_vc_root_dir
 
 
 class InitCommand(PCommandProcessor):

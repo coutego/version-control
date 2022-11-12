@@ -2,7 +2,7 @@ import tempfile
 import shutil
 import unittest
 from unittest import TestCase
-from vc.prots import PObjectDB
+from vc.api import PObjectDB
 from vc.impl.db import DB
 from vc.impl.fs import create_vc_root_dir
 

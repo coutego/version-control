@@ -6,7 +6,7 @@ import os.path
 from itertools import dropwhile
 from dataclasses import dataclass
 from typing import List, Optional, Callable, Tuple
-from ..prots import (
+from ..api import (
     PRepo,
     LogEntry,
     RepoStatus,

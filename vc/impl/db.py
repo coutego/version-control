@@ -6,7 +6,7 @@ import glob
 import zlib
 import hashlib
 from typing import Tuple, Union
-from vc.prots import PObjectDB, DBObject, DBObjectType, DBObjectKey
+from ..api import PObjectDB, DBObject, DBObjectType, DBObjectKey
 
 VC_DIR = ".vc"
 
