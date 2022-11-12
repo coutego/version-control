@@ -46,7 +46,11 @@
 - [ ] Only when no files have changed in both branches
 - [ ] Indicate just one big conflict for the whole file
 * Bugfixes
-** TODO New bug: added and committed file stays as 'new'
+** DONE New bug: added and committed file stays as 'new'
+:LOGBOOK:
+CLOCK: [2022-11-12 Sat 21:56]--[2022-11-12 Sat 22:04] =>  0:08
+:END:
+- Checked with 'test_avoid_new_after_commit'
 *** Sample
 coutego@laptop:~/tmp/bug-new$ vc add README.org
 coutego@laptop:~/tmp/bug-new$ vc commit -m 'add README'
@@ -92,7 +96,7 @@ Untracked files:
 :LOGBOOK:
 CLOCK: [2022-11-12 Sat 21:09]--[2022-11-12 Sat 21:24] =>  0:15
 :END:
-- test_detect_new_without_any_commit
+- Checked in 'test_detect_new_without_any_commit'
 *** Sample
 ############# vc #############
 On branch *branches not implemented*

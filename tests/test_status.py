@@ -75,6 +75,22 @@ class StatusTest(TestCase):
             f.write(contents)
             return fn
 
+    def test_avoid_new_after_commit(self):
+        f1 = self.create_file("README.org", "abc")
+        st = self.repo.status()
+        self.assertEqual(len(st.staged), 0)
+        self.assertEqual(len(st.not_staged), 0)
+        self.assertEqual(len(st.not_tracked), 1)
+        self.index.stage_file(f1)
+        st = self.repo.status()
+        self.assertEqual(len(st.staged), 1)
+        self.assertEqual(len(st.not_staged), 0)
+        self.assertEqual(len(st.not_tracked), 0)
+        self.index.commit("Initial import")
+        st = self.repo.status()
+        self.assertEqual(len(st.staged), 0)
+        self.assertEqual(len(st.not_staged), 0)
+        self.assertEqual(len(st.not_tracked), 0)
 
 if __name__ == "__main__":
     import unittest
