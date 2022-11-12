@@ -20,14 +20,14 @@
 - [X] Implement with no options, no files specified
 - [ ] Implement with files specified
 
-** TODO Implement 'diff' [0/2]
+** TODO Implement 'diff' [1/2]
 :LOGBOOK:
-CLOCK: [2022-11-12 Sat 23:07]
+CLOCK: [2022-11-12 Sat 23:07]--[2022-11-12 Sat 23:55] =>  0:48
 :END:
-- [ ] Implement with no options, no files specified
-  - [ ] For worktree vs HEAD
+- [-] Implement with no options, no files specified
+  - [X] For worktree vs staging area
   - [ ] For worktree vs arbitrary
-- [ ] Implement with files specified
+- [X] Implement with files specified
 
 ** TODO Implement 'restore' [0/1]
 - [ ] vc restore --staged <file-name>

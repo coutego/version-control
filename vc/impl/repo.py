@@ -3,6 +3,7 @@
 from __future__ import annotations  # For factory methods in Commit, etc.
 import os
 import os.path
+import difflib
 from itertools import dropwhile
 from dataclasses import dataclass
 from typing import List, Optional, Callable, Tuple
@@ -95,7 +96,7 @@ class Repo(PRepo):
         If the list is empty, provide the diff for all files.
         By default, the diff is between the file in the workdir and the head.
         """
-        raise Exception("Not implemented")
+        return _diff(self.root, self.db, self.index, files)
 
 @dataclass
 class Commit:
@@ -559,3 +560,42 @@ def _branch_list(root: str) -> Tuple[List[str], Optional[str]]:
     branches = list_files(root, "refs/heads")
     curr, _ = _branch_current(root)
     return (branches, curr)
+
+def _diff(root: str, db: PObjectDB, index: PIndex, files: List[str]) -> List[str]:
+    # FIXME: almost all this code is copied from _status -> refactor
+    if root is None or root.strip() == "":
+        raise FileNotFoundError("Not in a repository")
+    stag_dict: DirDict = index.dirtree()
+    dirs = list(stag_dict.keys())
+    work_dict: DirDict = _build_working_dict(dirs, _read_ignore(root))
+    head_dict: DirDict = _build_head_dict(db, root)
+
+    staged: List[FileWithStatus] = []
+    not_staged: List[FileWithStatus] = []
+    not_tracked: List[FileWithStatus] = []
+
+    ret = RepoStatus("*branches not implemented*", staged, not_staged, not_tracked)
+
+    all_files = []
+    all_files.extend(stag_dict.all_file_names())
+    all_files.extend(work_dict.all_file_names())
+    all_files.extend(head_dict.all_file_names())
+
+    set_all_files = set(all_files)
+    if len(files) > 0:
+        set_all_files = set_all_files.intersection(files)
+    ret = []
+    for f in set_all_files:
+        ret.append(_diff_file(db, root, stag_dict, f))
+    return ret
+
+
+def _diff_file(db: PObjectDB, root: str, stag_dict: DirDict, file: str) -> str:
+    fwdc = ""
+    with open(root + '/../' + file, "r") as f:
+        fwdc = f.read()
+    fst = stag_dict.find_entry(file)
+    fstc = ""
+    if fst is not None:
+        fstc = db.get(fst.ehash).text  # FIXME: support binary files
+    return ''.join(difflib.context_diff(fstc.splitlines(True), fwdc.splitlines(True), fromfile=file, tofile=file))
