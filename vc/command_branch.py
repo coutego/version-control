@@ -16,7 +16,7 @@ class BranchCommand(PCommandProcessor):
         """Initialize the repo."""
         self.repo = repo
         parser = argparse.ArgumentParser()
-        parser.add_argument("branch_name", nargs=1)
+        parser.add_argument("branch_name", nargs='?')
         parser.add_argument("branch2_name", nargs='?')
         parser.add_argument("-d", "--delete", action="store_true", help="Delete a branch")
         parser.add_argument("-m", "--move", action="store_true", help="Move/rename a branch")
@@ -37,6 +37,16 @@ class BranchCommand(PCommandProcessor):
             self.parser.print_help(sys.stderr)
             return
         try:
+            if not r.branch_name or len(r.branch_name) == 0:
+                if r.delete or r.move:
+                    print("branch name needed", sys.stderr)
+                    exit(1)
+                else:
+                    branches, curr = self.repo.list_branches()
+                    for b in branches:
+                        selected = "*" if b == curr else " "
+                        print(f"{selected} {b}")
+                    exit(0)
             if r.delete:
                 id = self.repo.delete_branch(r.branch_name)
                 print(f"Deleted branch {r.branch_name} (was {id})")

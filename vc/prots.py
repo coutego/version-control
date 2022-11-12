@@ -1,7 +1,7 @@
 """Protocols for the different components of the VC."""
 
 from dataclasses import dataclass
-from typing import Protocol, List, Optional, NamedTuple, Dict, Union
+from typing import Protocol, List, Optional, NamedTuple, Dict, Union, Tuple
 from enum import Enum
 
 
@@ -241,6 +241,10 @@ class PRepo(Protocol):
 
     def create_branch(self, branch_name: str):
         """Create a branch with the given name."""
+        ...
+
+    def list_branches(self) -> Tuple[List[str], Optional[str]]:
+        """List the existing branches.."""
         ...
 
     @property

@@ -29,9 +29,8 @@ class MainCommandProcessor(PCommandProcessor):
         """Build the object tree."""
         root = find_vc_root_dir()
         procs = []
-        if root is None:
-            procs.append(InitCommand())
-        else:
+        procs.append(InitCommand())
+        if root is not None:
             db = DB(root)
             index = Index(db, root)
             repo = Repo(index, db, root)
@@ -66,7 +65,7 @@ class MainCommandProcessor(PCommandProcessor):
         if cmd not in self.processors.keys():
             print(
                 f"Command '{cmd}' not implemented. Available commands:"
-                + " {', '.join(self.processors.keys())}",
+                + f" {', '.join(self.processors.keys())}",
                 file=sys.stderr,
             )
             exit(-1)

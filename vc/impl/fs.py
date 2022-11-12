@@ -2,7 +2,7 @@
 
 import os
 import os.path
-from typing import Optional
+from typing import Optional, List
 
 VC_DIR = ".vc"
 
@@ -54,7 +54,9 @@ def write_file(base_dir: str, file: str, contents: str) -> None:
 
 def read_file(base_dir: str, file: str) -> str:
     """Read the file from the repo at base_dir, creating it if needed."""
-    path = _create_path_if_needed(base_dir, file)
+    path = _build_full_path(base_dir, file)
+    if (not os.path.exists(path)):
+        return ""
     with open(path, "r") as f:
         return f.read().rstrip()
 
@@ -62,6 +64,13 @@ def exists_file(base_dir: str, file: str) -> bool:
     """Return True is the file exists in the repo."""
     return os.path.exists(base_dir + "/" + file)
 
+def list_files(base_dir: str, rel_path: str) -> List[str]:
+    """Return the list of files contained in the dir 'rel_path'."""
+    full_path = base_dir + '/' + rel_path
+    if not os.path.isdir(full_path):
+        raise FileNotFoundError(f"'{full_path}' is not a directory")
+    files = os.listdir(full_path)
+    return [f for f in files if os.path.isfile(full_path + "/" + f)]
 
 def _create_path_if_needed(base_dir: str, file: str) -> str:
     """Creathe the dires for the given file path, if they don't already exist"""

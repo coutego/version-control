@@ -19,7 +19,7 @@ from ..prots import (
     DirDict,
     FileName,
 )
-from .fs import exists_file, head_read, head_write, read_file, write_file
+from .fs import exists_file, head_read, head_write, list_files, read_file, write_file
 
 class Repo(PRepo):
     """Represent a repository."""
@@ -83,6 +83,12 @@ class Repo(PRepo):
     def create_branch(self, branch_name: str):
         """Create a branch with the given name."""
         _branch_create(self.root, branch_name)
+
+
+    def list_branches(self) -> Tuple[List[str], Optional[str]]:
+        """List the existing branches.."""
+        return _branch_list(self.root)
+
 
 @dataclass
 class Commit:
@@ -487,10 +493,10 @@ def _checkout(
             contents = db.get(f.ehash).contents
             with open(f.ename, "wb") as ff:
                 ff.write(contents)
-    if branch is not None: # FIXME: refactor. This is a hack. branch
-        head_write(root, "refs/heads/" + branch)
-    else:
+    if branch is None: # FIXME: refactor. This is a hack. branch
         head_write(root, full_commit_hash)
+    else:
+        head_write(root, "refs/heads/" + branch)
     index.set_to_dirtree(commit_dict)
     return commit.comment.splitlines()[0]
 
@@ -541,3 +547,8 @@ def _branch_create(root: str, name: str) -> None:
         raise FileExistsError(f"The branch {name} already exists")
     _, commit_id = _branch_current(root)
     write_file(root, hf, commit_id)
+
+def _branch_list(root: str) -> Tuple[List[str], Optional[str]]:
+    branches = list_files(root, "refs/heads")
+    curr, _ = _branch_current(root)
+    return (branches, curr)
