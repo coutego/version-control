@@ -32,29 +32,36 @@ def create_vc_root_dir(parent_dir=os.curdir) -> str:
 
 def index_write(base_dir: str, contents: str) -> None:
     """Write the contents of the index file."""
-    _write_file(base_dir, "index", contents)
+    write_file(base_dir, "index", contents)
 
 def index_read(base_dir: str) -> str:
     """Read the contents of the index file."""
-    return _read_file(base_dir, "index")
+    return read_file(base_dir, "index")
 
 def head_write(base_dir: str, contents: str) -> None:
     """Write the contents of the HEAD file."""
-    _write_file(base_dir, "HEAD", contents)
+    write_file(base_dir, "HEAD", contents)
 
 def head_read(base_dir: str) -> str:
     """Read the contents of the HEAD file."""
-    return _read_file(base_dir, "HEAD")
+    return read_file(base_dir, "HEAD")
 
-def _write_file(base_dir: str, file: str, contents: str) -> None:
+def write_file(base_dir: str, file: str, contents: str) -> None:
+    """Write to the file from the repo at base_dir, creating it if needed."""
     path = _create_path_if_needed(base_dir, file)
-    with open(path, "w+") as f:
-        f.write(contents)
+    with open(path, "w") as f:
+        f.write(contents + "\n")
 
-def _read_file(base_dir: str, file: str) -> str:
+def read_file(base_dir: str, file: str) -> str:
+    """Read the file from the repo at base_dir, creating it if needed."""
     path = _create_path_if_needed(base_dir, file)
-    with open(path, "r+") as f:
-        return f.read()
+    with open(path, "r") as f:
+        return f.read().rstrip()
+
+def exists_file(base_dir: str, file: str) -> bool:
+    """Return True is the file exists in the repo."""
+    return os.path.exists(base_dir + "/" + file)
+
 
 def _create_path_if_needed(base_dir: str, file: str) -> str:
     """Creathe the dires for the given file path, if they don't already exist"""

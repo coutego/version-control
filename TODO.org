@@ -117,6 +117,8 @@ Untracked files:
 
 ** TODO Implement 'diff' [0/2]
 - [ ] Implement with no options, no files specified
+  - [ ] For worktree vs HEAD
+  - [ ] For worktree vs arbitrary
 - [ ] Implement with files specified
 
 ** TODO Implement 'restore' [0/1]
@@ -131,8 +133,8 @@ Untracked files:
 - [ ] Implement deletion of files
 - [ ] From branch
 
-** TODO Implement branches [0/2]
-- [ ] Change commit to use references
+** TODO Implement branches [1/2]
+- [X] Change commit to use references
 - [ ] Check unchecked files will not be overwritten
 
 ** TODO Implement merge [0/2]

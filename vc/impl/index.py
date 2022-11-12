@@ -2,7 +2,7 @@
 
 import os.path
 
-from typing import Dict, Optional, List, Set, Optional
+from typing import Dict, Optional, List, Set, Optional, Tuple
 from ..prots import (
     PIndex,
     PObjectDB,
@@ -14,7 +14,7 @@ from ..prots import (
     FileType,
     FileName,
 )
-from .fs import head_read, head_write
+from .fs import head_read, head_write, write_file, read_file
 
 
 class Index(PIndex):
@@ -89,11 +89,11 @@ class Index(PIndex):
         """Commit the current index, returning the commit hash."""
         if message is None:
             message = "<no commit message>"
-        parent = head_read(self.root)
+        _, parent = _branch_current(self.root)
 
         commit = _prepare_commit(self.save_to_db(), parent, message)
         nkey = self.db.put(commit)
-        head_write(self.root, f"{nkey}\n")
+        _head_advance(self.root, nkey)
         return nkey
 
     def dirtree(self) -> DirDict:
@@ -226,3 +226,27 @@ def _build_tree(idx: Dict[str, IndexEntry]):
             ret[d] = []
         ret[d].append(e)
     return ret
+
+def _head_advance(root: str, commit_id: str) -> None:
+    """Writes the commit id to the head, following refs."""
+    branch, _ = _branch_current(root)
+    if branch is None:
+        head_write(root, commit_id)
+    else:
+        write_file(root, "refs/heads/" + branch, commit_id)
+
+def _branch_current(root: str) -> Tuple[Optional[str], str]: # FIXME: BUG: Remove!!!!! Duplicated from repo.py
+    """Return the name and commit id of the current branch.
+
+    name can be None if head is detached.
+    """
+    headc = head_read(root)
+    if headc[:5] == "refs/":
+        rh = "refs/heads/"
+        branch = rh + headc[len(rh):]
+        branch = headc[len(rh):]
+
+        headc = read_file(root, rh + branch)
+        return (branch, headc)
+    else:
+        return (None, headc)

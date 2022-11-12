@@ -17,6 +17,7 @@ class CheckoutCommand(PCommandProcessor):
         self.repo = repo
         parser = argparse.ArgumentParser()
         parser.add_argument("commit_id", nargs=1)
+        parser.add_argument("-b", "--branch", action="store_true")
         try:
             self.parser = parser
         except Exception:
@@ -33,8 +34,9 @@ class CheckoutCommand(PCommandProcessor):
         if r.__contains__("h"):
             self.parser.print_help(sys.stderr)
             return
+
         try:
-            message: str = self.repo.checkout(r.commit_id[0])
+            message: str = self.repo.checkout(r.commit_id[0], r.branch)
             _print_success(r.commit_id[0], message)
         except Exception as e:
             print(f"{e}", file=sys.stderr)

@@ -217,16 +217,30 @@ class PRepo(Protocol):
         """Return the log entries for the current HEAD."""
         ...
 
-    def checkout(self, commit_id) -> str:
+    def checkout(self, commit_id_or_branch: str, create_branch: bool = False) -> str:
         """Checkout the commit and return its short message.
 
         Any errors are thrown as an exception, with a message ready to
-        be shown to the end user.
+        be shown to the end user. if create_branch is true, commit_id_or_branch
+        is assumed to be the name of a branch which will be created if it doesn't
+        exist.
         """
         ...
 
     def initialized(self) -> bool:
         """Check whether the repo has been initialized or not."""
+        ...
+
+    def delete_branch(self, branch_name: str):
+        """Delete the branch with the given name."""
+        ...
+
+    def rename_branch(self, branch_name: str, branch2_name: str):
+        """Move (rename) the branch to the given name."""
+        ...
+
+    def create_branch(self, branch_name: str):
+        """Create a branch with the given name."""
         ...
 
     @property

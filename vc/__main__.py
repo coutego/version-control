@@ -13,6 +13,7 @@ from .command_commit import CommitCommand
 from .command_status import StatusCommand
 from .command_log import LogCommand
 from .command_checkout import CheckoutCommand
+from .command_branch import BranchCommand
 from .impl.fs import find_vc_root_dir
 from .impl.db import DB
 from .impl.index import Index
@@ -41,6 +42,7 @@ class MainCommandProcessor(PCommandProcessor):
             procs.append(StatusCommand(repo))
             procs.append(LogCommand(repo))
             procs.append(CheckoutCommand(repo))
+            procs.append(BranchCommand(repo))
 
         for p in procs:
             self.processors[p.key] = p

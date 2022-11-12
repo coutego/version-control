@@ -5,7 +5,7 @@ import os
 import os.path
 from itertools import dropwhile
 from dataclasses import dataclass
-from typing import List, Optional, Callable
+from typing import List, Optional, Callable, Tuple
 from ..prots import (
     PRepo,
     LogEntry,
@@ -19,7 +19,7 @@ from ..prots import (
     DirDict,
     FileName,
 )
-from .fs import head_read, head_write
+from .fs import exists_file, head_read, head_write, read_file, write_file
 
 class Repo(PRepo):
     """Represent a repository."""
@@ -34,26 +34,6 @@ class Repo(PRepo):
         self._db = db
         self.root = root
 
-    def status(self) -> RepoStatus:
-        """Calculate and return the status of the repo."""
-        return _status(self._index, self._db, self.root)
-
-    def log(self) -> List[LogEntry]:
-        """Return the log entries for the current HEAD."""
-        return _log(self._db, self.root)
-
-    def checkout(self, commit_id) -> str:
-        """Checkout the commit and return its short message.
-
-        Any errors are thrown as an exception, with a message ready to
-        be shown to the end user.
-        """
-        return _checkout(self._index, self._db, self.root, commit_id)
-
-    def initialized(self) -> bool:
-        """Check whether the repo has been initialized or not."""
-        return self.root is not None and os.path.exists(self.root)
-
     @property
     def db(self) -> PObjectDB:
         """Return the db used by this repo."""
@@ -64,11 +44,51 @@ class Repo(PRepo):
         """Return the index used by this repo."""
         return self._index
 
+    def init_repo(self):
+        """Initialize the repo."""
+        ini_branch = "master" # FIXME make 'master' configurable
+        _branch_create(self.root, ini_branch)
+        head_write(self.root, "refs/heads/" + ini_branch)
+
+    def status(self) -> RepoStatus:
+        """Calculate and return the status of the repo."""
+        return _status(self._index, self._db, self.root)
+
+    def log(self) -> List[LogEntry]:
+        """Return the log entries for the current HEAD."""
+        return _log(self._db, self.root)
+
+    def checkout(self, commit_id_or_branch: str, create_branch: bool = False) -> str:
+        """Checkout the commit and return its short message.
+
+        Any errors are thrown as an exception, with a message ready to
+        be shown to the end user. if create_branch is true, commit_id_or_branch
+        is assumed to be the name of a branch which will be created if it doesn't
+        exist.
+        """
+        return _checkout(self._index, self._db, self.root, commit_id_or_branch, create_branch)
+
+    def initialized(self) -> bool:
+        """Check whether the repo has been initialized or not."""
+        return self.root is not None and os.path.exists(self.root)
+
+    def delete_branch(self, branch_name: str):
+        """Delete the branch with the given name."""
+        raise Exception("Not implemented")
+
+    def rename_branch(self, branch_name: str, branch2_name: str):
+        """Move (rename) the branch to the given name."""
+        raise Exception("Not implemented")
+
+    def create_branch(self, branch_name: str):
+        """Create a branch with the given name."""
+        _branch_create(self.root, branch_name)
 
 @dataclass
 class Commit:
     """Represents a Commit object."""
 
+    id: str
     parents: List[str]
     tree_id: str
     comment: str
@@ -90,6 +110,7 @@ class Commit:
     def from_str(s: str) -> Commit:
         """Build a Commit from its str file representation."""
         parents: List[str] = []
+        id = ""
         tree_id = ""
         comment = ""
         author = ""
@@ -112,11 +133,11 @@ class Commit:
                 comment += ln + "\n"
         clns = dropwhile(lambda x: "" == x.strip(), comment.splitlines())
         comment = "\n".join(clns)
-        return Commit(parents, tree_id, comment, author, committer)
+        return Commit(id, parents, tree_id, comment, author, committer)
 
     def to_str(self) -> str:
         """Represent a Commit as a str suitable to store on a file."""
-        ret = ""
+        ret = "" # FIXME: semantics are not clear
         if self.tree_id:
             ret += "tree_id " + self.tree_id + "\n"
         if self.parents:
@@ -133,12 +154,22 @@ class Commit:
     @staticmethod
     def from_hash(hsh: str, db: PObjectDB) -> Optional[Commit]:
         """Read a Commit from the db from its hash."""
-        c = db.get(hsh)
-        if c is None:
+        try:
+            c = db.get(hsh)
+        except:
             return None
         cs = c.text
-        return Commit.from_str(cs)
+        ret = Commit.from_str(cs)
+        ret.id = hsh
+        return ret
 
+    @staticmethod
+    def from_branch(root: str, branch: str, db: PObjectDB) -> Optional[Commit]:
+        """Read a Commit from the db from the head of the branch."""
+        commit = _branch_head(root, branch)
+        if commit is None:
+            return None
+        return Commit.from_hash(commit, db)
 
 @dataclass
 class TreeEntry:
@@ -407,7 +438,7 @@ def _matches(patterns: List[str], s: str) -> bool:
 def _log(db: PObjectDB, root: str) -> List[LogEntry]:
     """Return the log entries for the current HEAD."""
     ret: List[LogEntry] = []
-    chash: Optional[str] = _read_head_hash(root)
+    _, chash  = _branch_current(root)
     while chash:
         commit = Commit.from_hash(chash, db)
         if commit is None:
@@ -420,13 +451,22 @@ def _log(db: PObjectDB, root: str) -> List[LogEntry]:
     return ret
 
 
-def _checkout(index: PIndex, db: PObjectDB, root: str, commit_id: str) -> str:
-    commit = Commit.from_hash(commit_id, db)
-    full_commit_hash = db.get_full_key(commit_id)
+def _checkout(
+        index: PIndex, db: PObjectDB, root: str, commit_id_or_branch: str, create_branch: bool
+) -> str:
+    commit = Commit.from_hash(commit_id_or_branch, db)
+    branch = None
+    if commit is None:
+        branch = commit_id_or_branch
+        commit = Commit.from_branch(root, branch, db)
+        if commit is None and create_branch:
+                _branch_create(root, branch)
+                commit = Commit.from_hash(_branch_head(root, branch) or "", db)
     if commit is None:
         raise Exception(
-            f"error: pathspec '{commit_id}' did not match any file(s) known to vc"
+            f"error: pathspec '{commit_id_or_branch}' did not match any file(s) known to vc"
         )
+    full_commit_hash = db.get_full_key(commit.id)
 
     de = _dirty_entries_in_index(index, db)
     if de:
@@ -447,7 +487,10 @@ def _checkout(index: PIndex, db: PObjectDB, root: str, commit_id: str) -> str:
             contents = db.get(f.ehash).contents
             with open(f.ename, "wb") as ff:
                 ff.write(contents)
-    head_write(root, full_commit_hash)
+    if branch is not None: # FIXME: refactor. This is a hack. branch
+        head_write(root, "refs/heads/" + branch)
+    else:
+        head_write(root, full_commit_hash)
     index.set_to_dirtree(commit_dict)
     return commit.comment.splitlines()[0]
 
@@ -470,3 +513,31 @@ def _is_dirty_in_index(f: DirEntry, db: PObjectDB) -> bool:
         return False
     else:
         return True
+
+def _branch_current(root: str) -> Tuple[Optional[str], str]:
+    """Return the name and commit id of the current branch.
+
+    name can be None if head is detached.
+    """
+    headc = head_read(root)
+    if headc[:5] == "refs/":
+        rh = "refs/heads/"
+        branch = rh + headc[len(rh):]
+        branch = headc[len(rh):]
+
+        headc = read_file(root, rh + branch)
+        return (branch, headc)
+    else:
+        return (None, headc)
+
+def _branch_head(root: str, branch: str) -> Optional[str]:
+    rh = "refs/heads/" + branch
+    commit = read_file(root, rh)
+    return commit
+
+def _branch_create(root: str, name: str) -> None:
+    hf = "refs/heads/" + name
+    if exists_file(root, hf):
+        raise FileExistsError(f"The branch {name} already exists")
+    _, commit_id = _branch_current(root)
+    write_file(root, hf, commit_id)
