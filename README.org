@@ -35,7 +35,7 @@ $ alias vc='python -m vc'
 ** Supported commands
 For the time being, there are only a handful of commands implemented,
 with very few options.
-The following already work:
+The following already (partially) work:
 
 #+begin_src sh
 $ vc init
@@ -43,6 +43,11 @@ $ vc add <files>
 $ vc commit -m <msg>
 $ vc hash-object [--stdin] [-w] <file>
 $ vc cat-file [-e] [-p] [-t] <hash>
+$ vc status
+$ vc log [--oneline]
+$ vc checkout [-b] <commit-or-branch>
+$ vc branch <branch>
+$ vc diff <files>
 #+end_src
 
 For the complete list you can just type vc, for the complete list of available commands
@@ -52,8 +57,7 @@ At the time of writing this README, this is the output for two cases.
 
 #+begin_src sh
 $ vc
-Command required. Available commands: init, hash-object, cat-file, add, commit, status, log, checkout, branch
-
+Command required. Available commands: init, hash-object, cat-file, add, commit, status, log, checkout, branch, diff
 
 $ vc hash-object -h
 usage: __main__.py [-h] [-w] [--stdin] [file]
