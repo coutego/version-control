@@ -69,7 +69,11 @@ Already on a repository. Aborting
 Initialized empty VC repository in /home/pedro/tmp/bug-new/.vc
 coutego@laptop:~/tmp/bug-new$
 
-** TODO Show dirs in 'status' with a trailing slash
+** DONE Show dirs in 'status' with a trailing slash
+- Implemented in the command itself
+:LOGBOOK:
+CLOCK: [2022-11-12 Sat 22:46]--[2022-11-12 Sat 22:55] =>  0:09
+:END:
 *** Sample
 ############# vc #############
 On branch *branches not implemented*

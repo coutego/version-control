@@ -1,6 +1,7 @@
 """'status' command."""
 
 import sys
+import os.path
 import argparse
 from typing import List
 from ..api import PCommandProcessor, PRepo, RepoStatus, FileWithStatus
@@ -83,11 +84,17 @@ def _untracked_2str(fs: List[FileWithStatus]) -> str:
 
 def _files_with_status_2str(fs: List[FileWithStatus]) -> str:
     ret = ""
-
     for f in fs:
+        name = _add_slash_to_dir(f.name)
         if f.status:
-            ret += f"        {f.status.value}: {f.name}\n"
+            ret += f"        {f.status.value}: {name}\n"
         else:
-            ret += f"        {f.name}\n"
+            ret += f"        {name}\n"
 
+    return ret
+
+def _add_slash_to_dir(f: str) -> str:
+    ret = f
+    if os.path.isdir(f) and f[-1] != '/':
+        ret = f + '/'
     return ret
