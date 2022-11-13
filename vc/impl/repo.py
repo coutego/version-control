@@ -20,7 +20,7 @@ from ..api import (
     DirDict,
     FileName,
 )
-from .fs import exists_file, head_read, head_write, list_files, read_file, remove_file, write_file
+from .fs import exists_file, head_read, head_write, list_files, read_file, remove_file, write_file, rename_file
 
 class Repo(PRepo):
     """Represent a repository."""
@@ -77,14 +77,13 @@ class Repo(PRepo):
         """Delete the branch with the given name, returning its head."""
         return _branch_delete(self.root, branch_name)
 
-    def rename_branch(self, branch_name: str, branch2_name: str):
+    def rename_branch(self, branch_name: str, new_branch_name: str):
         """Move (rename) the branch to the given name."""
-        raise Exception("Not implemented")  # FIXME: implement
+        _branch_rename(self.root, branch_name, new_branch_name)
 
     def create_branch(self, branch_name: str):
         """Create a branch with the given name."""
         _branch_create(self.root, branch_name)
-
 
     def list_branches(self) -> Tuple[List[str], Optional[str]]:
         """List the existing branches.."""
@@ -563,6 +562,17 @@ def _branch_delete(root: str, branch_name: str) -> str:
     h = _branch_head(root, branch_name)
     remove_file(root, "refs/heads/" + branch_name)
     return h or ""
+
+def _branch_rename(root: str, branch_name: str, branch_new_name):
+    c = _branch_head(root, branch_name)
+    if c == '':
+        raise FileNotFoundError(f"error: refname refs/heads/{branch_name} not found")
+
+    c = _branch_head(root, branch_new_name)
+    if c != '':
+        raise FileExistsError(f"fatal: a branch named '{branch_new_name}' already exists")
+
+    rename_file(root, "refs/heads/" + branch_name, "refs/heads/" + branch_new_name)
 
 def _diff(root: str, db: PObjectDB, index: PIndex, files: List[str]) -> List[str]:
     # FIXME: almost all this code is copied from _status -> refactor

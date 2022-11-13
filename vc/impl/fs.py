@@ -64,6 +64,10 @@ def remove_file(base_dir: str, file_dir: str) -> None:
     """Remove the file or directory file_dir."""
     os.remove(base_dir + "/" + file_dir)
 
+def rename_file(base_dir: str, file_dir1: str, file_dir2: str) -> None:
+    """Rename the file or dir file_dir1 to file_dir2."""
+    os.rename(base_dir + "/" + file_dir1, base_dir + "/" + file_dir2)
+
 def exists_file(base_dir: str, file: str) -> bool:
     """Return True is the file exists in the repo."""
     return os.path.exists(base_dir + "/" + file)

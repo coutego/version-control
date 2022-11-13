@@ -51,11 +51,14 @@ CLOCK: [2022-11-12 Sat 23:07]--[2022-11-12 Sat 23:55] =>  0:48
 - [ ] Only when no files have changed in both branches
 - [ ] Indicate just one big conflict for the whole file
 * Bugfixes
-** TODO Implement delete branches
+** DONE Implement delete branches
 :LOGBOOK:
 CLOCK: [2022-11-13 Sun 21:34]--[2022-11-13 Sun 21:57] =>  0:23
 :END:
-** TODO Implement rename branches
+** DONE Implement rename branches
+:LOGBOOK:
+CLOCK: [2022-11-13 Sun 21:59]--[2022-11-13 Sun 22:20] =>  0:21
+:END:
 ** TODO Fix the "*branches not implemented*" message in status
 ** DONE New bug: added and committed file stays as 'new'
 :LOGBOOK:

@@ -51,8 +51,8 @@ class BranchCommand(PCommandProcessor):
                 id = self.repo.delete_branch(r.branch_name)
                 print(f"Deleted branch {r.branch_name} (was {id})")
             elif r.move:
-                self.repo.rename_branch(r.branch_name[0], r.branch2_name[0])
+                self.repo.rename_branch(r.branch_name, r.branch2_name)
             else:
-                self.repo.create_branch(r.branch_name[0])
+                self.repo.create_branch(r.branch_name)
         except Exception as e:
             print(f"{e}", file=sys.stderr) # FIXME: reproduce git style error messages for 'branch'
