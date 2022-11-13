@@ -51,6 +51,7 @@ CLOCK: [2022-11-12 Sat 23:07]--[2022-11-12 Sat 23:55] =>  0:48
 - [ ] Only when no files have changed in both branches
 - [ ] Indicate just one big conflict for the whole file
 * Bugfixes
+** TODO Show current head in 'vc branch' when in detached mode
 ** DONE Implement delete branches
 :LOGBOOK:
 CLOCK: [2022-11-13 Sun 21:34]--[2022-11-13 Sun 21:57] =>  0:23
@@ -135,6 +136,7 @@ Untracked files:
         TODO.org
 
 nothing added to commit but untracked files present (use "git add" to track)
+
 ** MAYBE Show summary changes in 'commit'
 *** Sample
 ############# vc #############
