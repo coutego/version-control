@@ -75,11 +75,11 @@ class Repo(PRepo):
 
     def delete_branch(self, branch_name: str):
         """Delete the branch with the given name."""
-        raise Exception("Not implemented")
+        raise Exception("Not implemented")  # FIXME: implement
 
     def rename_branch(self, branch_name: str, branch2_name: str):
         """Move (rename) the branch to the given name."""
-        raise Exception("Not implemented")
+        raise Exception("Not implemented")  # FIXME: implement
 
     def create_branch(self, branch_name: str):
         """Create a branch with the given name."""
@@ -404,11 +404,6 @@ def _build_working_dict(
                 a = d + "/" + a
             ret[d].append(DirEntry(a, typ, ""))
     return ret
-
-
-def _read_head_hash(root: str) -> str:
-    """Read and return the hash for the current HEAD."""
-    return head_read(root).strip()  # FIXME: follow references
 
 
 def _read_db_tree(db: PObjectDB, key: str, acc: Optional[DirDict] = None) -> DirDict:
