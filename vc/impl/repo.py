@@ -20,7 +20,17 @@ from ..api import (
     DirDict,
     FileName,
 )
-from .fs import exists_file, head_read, head_write, list_files, read_file, remove_file, write_file, rename_file
+from .fs import (
+    exists_file,
+    head_read,
+    head_write,
+    list_files,
+    read_file,
+    remove_file,
+    write_file,
+    rename_file,
+)
+
 
 class Repo(PRepo):
     """Represent a repository."""
@@ -47,7 +57,7 @@ class Repo(PRepo):
 
     def init_repo(self):
         """Initialize the repo."""
-        ini_branch = "master" # FIXME make 'master' configurable
+        ini_branch = "master"  # FIXME make 'master' configurable
         _branch_create(self.root, ini_branch)
         head_write(self.root, "refs/heads/" + ini_branch)
 
@@ -59,7 +69,9 @@ class Repo(PRepo):
         """Return the log entries for the current HEAD."""
         return _log(self._db, self.root)
 
-    def checkout(self, commit_id_or_branch: str, create_branch: bool = False) -> str:
+    def checkout(
+        self, commit_id_or_branch: str, create_branch: bool = False
+    ) -> Tuple[str, bool]:
         """Checkout the commit and return its short message.
 
         Any errors are thrown as an exception, with a message ready to
@@ -67,7 +79,9 @@ class Repo(PRepo):
         is assumed to be the name of a branch which will be created if it doesn't
         exist.
         """
-        return _checkout(self._index, self._db, self.root, commit_id_or_branch, create_branch)
+        return _checkout(
+            self._index, self._db, self.root, commit_id_or_branch, create_branch
+        )
 
     def initialized(self) -> bool:
         """Check whether the repo has been initialized or not."""
@@ -96,6 +110,7 @@ class Repo(PRepo):
         By default, the diff is between the file in the workdir and the head.
         """
         return _diff(self.root, self.db, self.index, files)
+
 
 @dataclass
 class Commit:
@@ -150,7 +165,7 @@ class Commit:
 
     def to_str(self) -> str:
         """Represent a Commit as a str suitable to store on a file."""
-        ret = "" # FIXME: semantics are not clear
+        ret = ""  # FIXME: semantics are not clear
         if self.tree_id:
             ret += "tree_id " + self.tree_id + "\n"
         if self.parents:
@@ -183,6 +198,7 @@ class Commit:
         if commit is None:
             return None
         return Commit.from_hash(commit, db)
+
 
 @dataclass
 class TreeEntry:
@@ -384,7 +400,7 @@ def _build_working_dict(
 ) -> DirDict:
     """Build the DirDict for the working dir, only taking into account entries in 'dirs'."""
     ret = DirDict()
-    for d in dirs + ['']:
+    for d in dirs + [""]:
         if d == "":
             dd = "."
         else:
@@ -447,7 +463,7 @@ def _matches(patterns: List[str], s: str) -> bool:
 def _log(db: PObjectDB, root: str) -> List[LogEntry]:
     """Return the log entries for the current HEAD."""
     ret: List[LogEntry] = []
-    _, chash  = _branch_current(root)
+    _, chash = _branch_current(root)
     while chash:
         commit = Commit.from_hash(chash, db)
         if commit is None:
@@ -461,7 +477,11 @@ def _log(db: PObjectDB, root: str) -> List[LogEntry]:
 
 
 def _checkout(
-        index: PIndex, db: PObjectDB, root: str, commit_id_or_branch: str, create_branch: bool
+    index: PIndex,
+    db: PObjectDB,
+    root: str,
+    commit_id_or_branch: str,
+    create_branch: bool,
 ) -> Tuple[str, bool]:
     commit = Commit.from_hash(commit_id_or_branch, db)
     branch = None
@@ -469,8 +489,8 @@ def _checkout(
         branch = commit_id_or_branch
         commit = Commit.from_branch(root, branch, db)
         if commit is None and create_branch:
-                _branch_create(root, branch)
-                commit = Commit.from_hash(_branch_head(root, branch) or "", db)
+            _branch_create(root, branch)
+            commit = Commit.from_hash(_branch_head(root, branch) or "", db)
     if commit is None:
         raise Exception(
             f"error: pathspec '{commit_id_or_branch}' did not match any file(s) known to vc"
@@ -496,7 +516,7 @@ def _checkout(
             contents = db.get(f.ehash).contents
             with open(f.ename, "wb") as ff:
                 ff.write(contents)
-    if branch is None: # FIXME: refactor. This is a hack. branch
+    if branch is None:  # FIXME: refactor. This is a hack. branch
         head_write(root, full_commit_hash)
     else:
         head_write(root, "refs/heads/" + branch)
@@ -523,6 +543,7 @@ def _is_dirty_in_index(f: DirEntry, db: PObjectDB) -> bool:
     else:
         return True
 
+
 def _branch_current(root: str) -> Tuple[Optional[str], str]:
     """Return the name and commit id of the current branch.
 
@@ -531,18 +552,20 @@ def _branch_current(root: str) -> Tuple[Optional[str], str]:
     headc = head_read(root)
     if headc[:5] == "refs/":
         rh = "refs/heads/"
-        branch = rh + headc[len(rh):]
-        branch = headc[len(rh):]
+        branch = rh + headc[len(rh) :]
+        branch = headc[len(rh) :]
 
         headc = read_file(root, rh + branch)
         return (branch, headc)
     else:
         return (None, headc)
 
+
 def _branch_head(root: str, branch: str) -> Optional[str]:
     rh = "refs/heads/" + branch
     commit = read_file(root, rh)
     return commit
+
 
 def _branch_create(root: str, name: str) -> None:
     hf = "refs/heads/" + name
@@ -551,29 +574,37 @@ def _branch_create(root: str, name: str) -> None:
     _, commit_id = _branch_current(root)
     write_file(root, hf, commit_id)
 
+
 def _branch_list(root: str) -> Tuple[List[str], Optional[str]]:
     branches = list_files(root, "refs/heads")
     curr, _ = _branch_current(root)
     return (branches, curr)
 
+
 def _branch_delete(root: str, branch_name: str) -> str:
-    b, _ =_branch_current(root)
+    b, _ = _branch_current(root)
     if b == branch_name:
-        raise FileExistsError(f"error: Cannot delete branch '{b}' checked out at '{root}'")
+        raise FileExistsError(
+            f"error: Cannot delete branch '{b}' checked out at '{root}'"
+        )
     h = _branch_head(root, branch_name)
     remove_file(root, "refs/heads/" + branch_name)
     return h[:7] if h else ""
 
+
 def _branch_rename(root: str, branch_name: str, branch_new_name):
     c = _branch_head(root, branch_name)
-    if c == '':
+    if c == "":
         raise FileNotFoundError(f"error: refname refs/heads/{branch_name} not found")
 
     c = _branch_head(root, branch_new_name)
-    if c != '':
-        raise FileExistsError(f"fatal: a branch named '{branch_new_name}' already exists")
+    if c != "":
+        raise FileExistsError(
+            f"fatal: a branch named '{branch_new_name}' already exists"
+        )
 
     rename_file(root, "refs/heads/" + branch_name, "refs/heads/" + branch_new_name)
+
 
 def _diff(root: str, db: PObjectDB, index: PIndex, files: List[str]) -> List[str]:
     # FIXME: almost all this code is copied from _status -> refactor
@@ -600,10 +631,14 @@ def _diff(root: str, db: PObjectDB, index: PIndex, files: List[str]) -> List[str
 
 def _diff_file(db: PObjectDB, root: str, stag_dict: DirDict, file: str) -> str:
     fwdc = ""
-    with open(root + '/../' + file, "r") as f:
+    with open(root + "/../" + file, "r") as f:
         fwdc = f.read()
     fst = stag_dict.find_entry(file)
     fstc = ""
     if fst is not None:
         fstc = db.get(fst.ehash).text  # FIXME: support binary files
-    return ''.join(difflib.context_diff(fstc.splitlines(True), fwdc.splitlines(True), fromfile=file, tofile=file))
+    return "".join(
+        difflib.context_diff(
+            fstc.splitlines(True), fwdc.splitlines(True), fromfile=file, tofile=file
+        )
+    )

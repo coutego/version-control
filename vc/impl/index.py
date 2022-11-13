@@ -227,6 +227,7 @@ def _build_tree(idx: Dict[str, IndexEntry]):
         ret[d].append(e)
     return ret
 
+
 def _head_advance(root: str, commit_id: str) -> None:
     """Writes the commit id to the head, following refs."""
     branch, _ = _branch_current(root)
@@ -235,7 +236,10 @@ def _head_advance(root: str, commit_id: str) -> None:
     else:
         write_file(root, "refs/heads/" + branch, commit_id)
 
-def _branch_current(root: str) -> Tuple[Optional[str], str]: # FIXME: BUG: Remove!!!!! Duplicated from repo.py
+
+def _branch_current(
+    root: str,
+) -> Tuple[Optional[str], str]:  # FIXME: BUG: Remove!!!!! Duplicated from repo.py
     """Return the name and commit id of the current branch.
 
     name can be None if head is detached.
@@ -243,8 +247,8 @@ def _branch_current(root: str) -> Tuple[Optional[str], str]: # FIXME: BUG: Remov
     headc = head_read(root)
     if headc[:5] == "refs/":
         rh = "refs/heads/"
-        branch = rh + headc[len(rh):]
-        branch = headc[len(rh):]
+        branch = rh + headc[len(rh) :]
+        branch = headc[len(rh) :]
 
         headc = read_file(root, rh + branch)
         return (branch, headc)

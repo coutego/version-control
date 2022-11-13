@@ -16,10 +16,14 @@ class BranchCommand(PCommandProcessor):
         """Initialize the repo."""
         self.repo = repo
         parser = argparse.ArgumentParser()
-        parser.add_argument("branch_name", nargs='?')
-        parser.add_argument("branch2_name", nargs='?')
-        parser.add_argument("-d", "--delete", action="store_true", help="Delete a branch")
-        parser.add_argument("-m", "--move", action="store_true", help="Move/rename a branch")
+        parser.add_argument("branch_name", nargs="?")
+        parser.add_argument("branch2_name", nargs="?")
+        parser.add_argument(
+            "-d", "--delete", action="store_true", help="Delete a branch"
+        )
+        parser.add_argument(
+            "-m", "--move", action="store_true", help="Move/rename a branch"
+        )
         try:
             self.parser = parser
         except Exception:
@@ -55,4 +59,6 @@ class BranchCommand(PCommandProcessor):
             else:
                 self.repo.create_branch(r.branch_name)
         except Exception as e:
-            print(f"{e}", file=sys.stderr) # FIXME: reproduce git style error messages for 'branch'
+            print(
+                f"{e}", file=sys.stderr
+            )  # FIXME: reproduce git style error messages for 'branch'

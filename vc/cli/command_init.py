@@ -21,7 +21,9 @@ class InitCommand(PCommandProcessor):
         try:
             d = create_vc_root_dir()
         except:
-            print(f"Reinitialized existing VC repository in {os.path.abspath(os.curdir)}")
+            print(
+                f"Reinitialized existing VC repository in {os.path.abspath(os.curdir)}"
+            )
             # FIXME: do actually reinitialize it
             exit(1)
         db = DB(d)

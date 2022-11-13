@@ -218,7 +218,9 @@ class PRepo(Protocol):
         """Return the log entries for the current HEAD."""
         ...
 
-    def checkout(self, commit_id_or_branch: str, create_branch: bool = False) -> Tuple[str, bool]:
+    def checkout(
+        self, commit_id_or_branch: str, create_branch: bool = False
+    ) -> Tuple[str, bool]:
         """Checkout the commit and return its short message.
 
         Any errors are thrown as an exception, with a message ready to

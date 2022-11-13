@@ -39,7 +39,7 @@ class DiffCommand(PCommandProcessor):
         try:
             diff = self.repo.diff(r.files)
             for e in diff:
-                print(e, end='')
+                print(e, end="")
         except FileNotFoundError:
             print(
                 "fatal: not a vc repository (or any of the parent directories): .vc",

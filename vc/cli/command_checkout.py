@@ -60,6 +60,7 @@ Turn off this advice by setting config variable advice.detachedHead to false
 HEAD is now at {commit} {message}"""
     )
 
+
 def _maybe_detached(detached: bool) -> str:
     if detached:
         return """
