@@ -46,7 +46,7 @@ class StatusCommand(PCommandProcessor):
             )
             exit(1)
 
-        msg = f"On branch {st.branch}\n"
+        msg = f"Detached HEAD at {st.detached}" if st.detached else f"On branch {st.branch}\n"
         msg += _to_be_committed_2str(st.staged)
         msg += _not_staged_2str(st.not_staged)
         msg += _untracked_2str(st.not_tracked)

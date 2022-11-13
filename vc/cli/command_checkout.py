@@ -36,30 +36,36 @@ class CheckoutCommand(PCommandProcessor):
             return
 
         try:
-            message: str = self.repo.checkout(r.commit_id[0], r.branch)
-            _print_success(r.commit_id[0], message)
+            message, detached = self.repo.checkout(r.commit_id[0], r.branch)
+            _print_success(r.commit_id[0], detached, message)
         except Exception as e:
             print(f"{e}", file=sys.stderr)
 
 
-def _print_success(commit: str, message: str):
+def _print_success(commit: str, detached: bool, message: str):
     print(
-        f"Note: switching to '{commit}'.\n"
-        "\n"
-        "You are in 'detached HEAD' state. You can look around, make experimental\n"
-        "changes and commit them, and you can discard any commits you make in this\n"
-        "state without impacting any branches by switching back to a branch.\n"
-        "\n"
-        "If you want to create a new branch to retain commits you create, you may\n"
-        "do so (now or later) by using -c with the switch command. Example:\n"
-        "\n"
-        "  vc switch -c <new-branch-name>\n"
-        "\n"
-        "Or undo this operation with:\n"
-        "\n"
-        "  vc switch -\n"
-        "\n"
-        "Turn off this advice by setting config variable advice.detachedHead to false\n"
-        "\n"
-        f"HEAD is now at {commit} {message}"
+        f"""Note: switching to '{commit}'.
+{_maybe_detached(detached)}
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  vc switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  vc switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+HEAD is now at {commit} {message}"""
     )
+
+def _maybe_detached(detached: bool) -> str:
+    if detached:
+        return """
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+        """
+    else:
+        return ""

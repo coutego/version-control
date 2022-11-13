@@ -256,7 +256,8 @@ def _status(index: PIndex, db: PObjectDB, root: str) -> RepoStatus:
     not_staged: List[FileWithStatus] = []
     not_tracked: List[FileWithStatus] = []
 
-    ret = RepoStatus("*branches not implemented*", staged, not_staged, not_tracked)
+    b, h = _branch_current(root)
+    ret = RepoStatus(b, h[:7] if b is None else "", staged, not_staged, not_tracked)
 
     all_files = []
     all_files.extend(stag_dict.all_file_names())
@@ -461,7 +462,7 @@ def _log(db: PObjectDB, root: str) -> List[LogEntry]:
 
 def _checkout(
         index: PIndex, db: PObjectDB, root: str, commit_id_or_branch: str, create_branch: bool
-) -> str:
+) -> Tuple[str, bool]:
     commit = Commit.from_hash(commit_id_or_branch, db)
     branch = None
     if commit is None:
@@ -500,7 +501,7 @@ def _checkout(
     else:
         head_write(root, "refs/heads/" + branch)
     index.set_to_dirtree(commit_dict)
-    return commit.comment.splitlines()[0]
+    return (commit.comment.splitlines()[0], branch is None)
 
 
 def _dirty_entries_in_index(index: PIndex, db: PObjectDB) -> List[FileName]:
@@ -561,7 +562,7 @@ def _branch_delete(root: str, branch_name: str) -> str:
         raise FileExistsError(f"error: Cannot delete branch '{b}' checked out at '{root}'")
     h = _branch_head(root, branch_name)
     remove_file(root, "refs/heads/" + branch_name)
-    return h or ""
+    return h[:7] if h else ""
 
 def _branch_rename(root: str, branch_name: str, branch_new_name):
     c = _branch_head(root, branch_name)
@@ -582,12 +583,6 @@ def _diff(root: str, db: PObjectDB, index: PIndex, files: List[str]) -> List[str
     dirs = list(stag_dict.keys())
     work_dict: DirDict = _build_working_dict(dirs, _read_ignore(root))
     head_dict: DirDict = _build_head_dict(db, root)
-
-    staged: List[FileWithStatus] = []
-    not_staged: List[FileWithStatus] = []
-    not_tracked: List[FileWithStatus] = []
-
-    ret = RepoStatus("*branches not implemented*", staged, not_staged, not_tracked)
 
     all_files = []
     all_files.extend(stag_dict.all_file_names())

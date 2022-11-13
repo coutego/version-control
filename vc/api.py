@@ -192,7 +192,8 @@ class PIndex(Protocol):
 class RepoStatus:
     """Captures the status of a repo."""
 
-    branch: Branch
+    branch: Optional[Branch]
+    detached: Optional[str]
     not_tracked: List[FileWithStatus]
     not_staged: List[FileWithStatus]
     staged: List[FileWithStatus]
@@ -217,7 +218,7 @@ class PRepo(Protocol):
         """Return the log entries for the current HEAD."""
         ...
 
-    def checkout(self, commit_id_or_branch: str, create_branch: bool = False) -> str:
+    def checkout(self, commit_id_or_branch: str, create_branch: bool = False) -> Tuple[str, bool]:
         """Checkout the commit and return its short message.
 
         Any errors are thrown as an exception, with a message ready to
