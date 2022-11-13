@@ -231,8 +231,8 @@ class PRepo(Protocol):
         """Check whether the repo has been initialized or not."""
         ...
 
-    def delete_branch(self, branch_name: str):
-        """Delete the branch with the given name."""
+    def delete_branch(self, branch_name: str) -> str:
+        """Delete the branch with the given name, returning its head."""
         ...
 
     def rename_branch(self, branch_name: str, branch2_name: str):

@@ -60,6 +60,10 @@ def read_file(base_dir: str, file: str) -> str:
     with open(path, "r") as f:
         return f.read().rstrip()
 
+def remove_file(base_dir: str, file_dir: str) -> None:
+    """Remove the file or directory file_dir."""
+    os.remove(base_dir + "/" + file_dir)
+
 def exists_file(base_dir: str, file: str) -> bool:
     """Return True is the file exists in the repo."""
     return os.path.exists(base_dir + "/" + file)

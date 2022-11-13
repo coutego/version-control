@@ -43,12 +43,20 @@ CLOCK: [2022-11-12 Sat 23:07]--[2022-11-12 Sat 23:55] =>  0:48
 
 ** TODO Implement branches [1/2]
 - [X] Change commit to use references
+- [ ] Implement delete branch
+- [ ] Implement rename branch
 - [ ] Check unchecked files will not be overwritten
 
 ** TODO Implement merge [0/2]
 - [ ] Only when no files have changed in both branches
 - [ ] Indicate just one big conflict for the whole file
 * Bugfixes
+** TODO Implement delete branches
+:LOGBOOK:
+CLOCK: [2022-11-13 Sun 21:34]--[2022-11-13 Sun 21:57] =>  0:23
+:END:
+** TODO Implement rename branches
+** TODO Fix the "*branches not implemented*" message in status
 ** DONE New bug: added and committed file stays as 'new'
 :LOGBOOK:
 CLOCK: [2022-11-12 Sat 21:56]--[2022-11-12 Sat 22:04] =>  0:08

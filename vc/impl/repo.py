@@ -20,7 +20,7 @@ from ..api import (
     DirDict,
     FileName,
 )
-from .fs import exists_file, head_read, head_write, list_files, read_file, write_file
+from .fs import exists_file, head_read, head_write, list_files, read_file, remove_file, write_file
 
 class Repo(PRepo):
     """Represent a repository."""
@@ -73,9 +73,9 @@ class Repo(PRepo):
         """Check whether the repo has been initialized or not."""
         return self.root is not None and os.path.exists(self.root)
 
-    def delete_branch(self, branch_name: str):
-        """Delete the branch with the given name."""
-        raise Exception("Not implemented")  # FIXME: implement
+    def delete_branch(self, branch_name: str) -> str:
+        """Delete the branch with the given name, returning its head."""
+        return _branch_delete(self.root, branch_name)
 
     def rename_branch(self, branch_name: str, branch2_name: str):
         """Move (rename) the branch to the given name."""
@@ -555,6 +555,14 @@ def _branch_list(root: str) -> Tuple[List[str], Optional[str]]:
     branches = list_files(root, "refs/heads")
     curr, _ = _branch_current(root)
     return (branches, curr)
+
+def _branch_delete(root: str, branch_name: str) -> str:
+    b, _ =_branch_current(root)
+    if b == branch_name:
+        raise FileExistsError(f"error: Cannot delete branch '{b}' checked out at '{root}'")
+    h = _branch_head(root, branch_name)
+    remove_file(root, "refs/heads/" + branch_name)
+    return h or ""
 
 def _diff(root: str, db: PObjectDB, index: PIndex, files: List[str]) -> List[str]:
     # FIXME: almost all this code is copied from _status -> refactor
