@@ -88,15 +88,26 @@ class Repo(PRepo):
         return self.root is not None and os.path.exists(self.root)
 
     def delete_branch(self, branch_name: str) -> str:
-        """Delete the branch with the given name, returning its head."""
+        """Delete the branch with the given name, returning its head.
+
+        Raise a FileNotFoundError if the branch doesn't exist.
+        Raise a FileExistsError if the branch is checked out.
+        """
         return _branch_delete(self.root, branch_name)
 
-    def rename_branch(self, branch_name: str, new_branch_name: str):
-        """Move (rename) the branch to the given name."""
-        _branch_rename(self.root, branch_name, new_branch_name)
+    def rename_branch(self, branch_name: str, destination_branch_name: str):
+        """Move (rename) the branch to the given name.
+
+        Raise a FileNotFoundError if branch_name doesn't exist.
+        Raise a FileExistsError if destination_branch_name already exists.
+        """
+        _branch_rename(self.root, branch_name, destination_branch_name)
 
     def create_branch(self, branch_name: str):
-        """Create a branch with the given name."""
+        """Create a branch with the given name.
+
+        Raise FileExistsError is the branch already exists.
+        """
         _branch_create(self.root, branch_name)
 
     def list_branches(self) -> Tuple[List[str], Optional[str]]:
@@ -582,23 +593,25 @@ def _branch_list(root: str) -> Tuple[List[str], Optional[str]]:
 
 
 def _branch_delete(root: str, branch_name: str) -> str:
+    if _branch_head(root, branch_name) == "":
+        raise FileNotFoundError(f"error: refname refs/heads/{branch_name} not found")
+
     b, _ = _branch_current(root)
     if b == branch_name:
         raise FileExistsError(
             f"error: Cannot delete branch '{b}' checked out at '{root}'"
         )
+
     h = _branch_head(root, branch_name)
     remove_file(root, "refs/heads/" + branch_name)
     return h[:7] if h else ""
 
 
 def _branch_rename(root: str, branch_name: str, branch_new_name):
-    c = _branch_head(root, branch_name)
-    if c == "":
+    if _branch_head(root, branch_name) == "":
         raise FileNotFoundError(f"error: refname refs/heads/{branch_name} not found")
 
-    c = _branch_head(root, branch_new_name)
-    if c != "":
+    if _branch_head(root, branch_new_name) != "":
         raise FileExistsError(
             f"fatal: a branch named '{branch_new_name}' already exists"
         )

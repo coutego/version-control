@@ -235,15 +235,26 @@ class PRepo(Protocol):
         ...
 
     def delete_branch(self, branch_name: str) -> str:
-        """Delete the branch with the given name, returning its head."""
+        """Delete the branch with the given name, returning its head.
+
+        Raise a FileNotFoundError if the branch doesn't exist.
+        Raise a FileExistsError if the branch is checked out.
+        """
         ...
 
-    def rename_branch(self, branch_name: str, branch2_name: str):
-        """Move (rename) the branch to the given name."""
+    def rename_branch(self, branch_name: str, destination_branch_name: str):
+        """Move (rename) the branch to the given name.
+
+        Raise a FileNotFoundError if branch_name doesn't exist.
+        Raise a FileExistsError if destination_branch_name already exists.
+        """
         ...
 
     def create_branch(self, branch_name: str):
-        """Create a branch with the given name."""
+        """Create a branch with the given name.
+
+        Raise FileExistsError is the branch already exists.
+        """
         ...
 
     def list_branches(self) -> Tuple[List[str], Optional[str]]:
