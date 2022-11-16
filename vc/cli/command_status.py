@@ -47,7 +47,7 @@ class StatusCommand(PCommandProcessor):
             exit(1)
 
         msg = (
-            f"Detached HEAD at {st.detached}"
+            f"Detached HEAD at {st.detached}\n"
             if st.detached
             else f"On branch {st.branch}\n"
         )
