@@ -3,27 +3,21 @@ import shutil
 import os.path
 import os
 from unittest import TestCase
-from vc.api import PObjectDB, PRepo, PIndex
-from vc.impl.db import DB
-from vc.impl.repo import Repo
-from vc.impl.index import Index
+from vc.api import PRepo
+from vc.impl import create_repo
 
 
 class CheckoutTest(TestCase):
     rootdir: str
     repodir: str
-    db: PObjectDB
     repo: PRepo
-    index: PIndex
 
     def setUp(self):
         self.rootdir = tempfile.mkdtemp(dir=tempfile.gettempdir())
         self.repodir = self.rootdir + "/.vc"
         os.mkdir(self.repodir)
         os.chdir(self.rootdir)
-        self.db = DB(self.repodir)
-        self.index = Index(self.db, self.repodir)
-        self.repo = Repo(self.index, self.db, self.repodir)
+        self.repo = create_repo(self.repodir)
 
     def tearDown(self):
         shutil.rmtree(self.rootdir)
@@ -33,16 +27,16 @@ class CheckoutTest(TestCase):
         flicense = "LICENSE"
         f1 = self.create_file(freadme, "abc")
         f2 = self.create_file(flicense, "EUPL")
-        self.index.stage_file(f1)
-        self.index.stage_file(f2)
+        self.repo.index.stage_file(f1)
+        self.repo.index.stage_file(f2)
         c1msg = "first commit"
-        c1 = self.index.commit(c1msg)
+        c1 = self.repo.index.commit(c1msg)
 
         with open(f1, "a") as f:
             f.write("def")
-        self.index.stage_file(f1)
+        self.repo.index.stage_file(f1)
         c2msg = "second commit"
-        c2 = self.index.commit(c2msg)
+        c2 = self.repo.index.commit(c2msg)
 
         st = self.repo.status()
         self.assertEqual(len(st.staged), 0)

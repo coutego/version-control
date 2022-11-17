@@ -16,9 +16,7 @@ from .command_checkout import CheckoutCommand
 from .command_branch import BranchCommand
 from .command_diff import DiffCommand
 from ..impl.fs import find_vc_root_dir
-from ..impl.db import DB
-from ..impl.index import Index
-from ..impl.repo import Repo
+from ..impl import create_repo
 
 
 class MainCommandProcessor(PCommandProcessor):
@@ -32,9 +30,7 @@ class MainCommandProcessor(PCommandProcessor):
         procs = []
         procs.append(InitCommand())
         if root is not None:
-            db = DB(root)
-            index = Index(db, root)
-            repo = Repo(index, db, root)
+            repo = create_repo(root)
             procs.append(HashObjectCommand(repo))
             procs.append(CatFileCommand(repo))
             procs.append(AddCommand(repo))
