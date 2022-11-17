@@ -10,28 +10,19 @@ from vc.impl.repo import Repo
 
 class StatusTest(TestCase):
     rootdir: str
-    repodir: str
     repo: PRepo
 
     def setUp(self):
         self.rootdir = tempfile.mkdtemp(dir=tempfile.gettempdir())
-        self.repodir = self.rootdir + "/.vc"
-        os.mkdir(self.repodir)
         os.chdir(self.rootdir)
-        self.repo = create_repo(self.repodir)
+        self.repo = create_repo(self.rootdir, True)
 
     def tearDown(self):
         shutil.rmtree(self.rootdir)
 
     def test_empty(self):
-        local_repo = create_repo("")
         with self.assertRaises(FileNotFoundError):
-            local_repo.status()
-        st = self.repo.status()
-        self.assertIsNotNone(st)
-        self.assertEqual(len(st.not_staged), 0)
-        self.assertEqual(len(st.staged), 0)
-        self.assertEqual(len(st.staged), 0)
+            create_repo("")
 
     def test_detect_new_without_any_commit(self):
         f1 = self.create_file("README.org", "abc")
@@ -86,6 +77,7 @@ class StatusTest(TestCase):
         self.assertEqual(len(st.staged), 0)
         self.assertEqual(len(st.not_staged), 0)
         self.assertEqual(len(st.not_tracked), 0)
+
 
 if __name__ == "__main__":
     import unittest

@@ -9,15 +9,12 @@ from vc.impl import create_repo
 
 class CheckoutTest(TestCase):
     rootdir: str
-    repodir: str
     repo: PRepo
 
     def setUp(self):
         self.rootdir = tempfile.mkdtemp(dir=tempfile.gettempdir())
-        self.repodir = self.rootdir + "/.vc"
-        os.mkdir(self.repodir)
         os.chdir(self.rootdir)
-        self.repo = create_repo(self.repodir)
+        self.repo = create_repo(self.rootdir, True)
 
     def tearDown(self):
         shutil.rmtree(self.rootdir)
