@@ -18,10 +18,6 @@ class AddCommand(PCommandProcessor):
         parser.add_argument("files", type=str, nargs="*")
         self.parser = parser
 
-    @property
-    def key(self):
-        return "add"
-
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
         require_initialized_repo(self.repo)

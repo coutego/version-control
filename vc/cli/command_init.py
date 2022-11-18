@@ -6,15 +6,12 @@ from ..impl.db import DB
 from ..impl.index import Index
 from ..impl.repo import Repo
 from ..api import PCommandProcessor
-from ..impl.fs import create_vc_root_dir, find_vc_root_dir
 
 
 class InitCommand(PCommandProcessor):
     """Implementation of the cat-file command."""
 
-    @property
-    def key(self):
-        return "init"
+    no_repo_needed = True
 
     def process_command(self, _: List[str]) -> None:
         """Process the command with the given args."""

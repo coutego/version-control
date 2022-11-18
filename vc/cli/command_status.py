@@ -11,6 +11,8 @@ from .util import require_initialized_repo
 class StatusCommand(PCommandProcessor):
     """Implementation of the 'status' command."""
 
+    repo: PRepo
+
     def __init__(self, repo: PRepo):
         """Initialize the repo."""
         self.repo = repo
@@ -21,12 +23,6 @@ class StatusCommand(PCommandProcessor):
             self.parser = parser
         except Exception:
             parser.print_help(sys.stderr)
-
-    @property
-    def key(self):
-        return "status"
-
-    repo: PRepo
 
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""

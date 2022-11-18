@@ -21,10 +21,6 @@ class DiffCommand(PCommandProcessor):
         except Exception:
             parser.print_help(sys.stderr)
 
-    @property
-    def key(self):
-        return "diff"
-
     repo: PRepo
 
     def process_command(self, args: List[str]) -> None:

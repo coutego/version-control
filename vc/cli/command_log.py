@@ -23,10 +23,6 @@ class LogCommand(PCommandProcessor):
         except Exception:
             parser.print_help(sys.stderr)
 
-    @property
-    def key(self):
-        return "log"
-
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
         # FIXME: implement option to specify files

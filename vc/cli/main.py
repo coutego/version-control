@@ -22,55 +22,52 @@ from ..impl import create_repo
 class MainCommandProcessor(PCommandProcessor):
     """Main CommandProcessor."""
 
-    processors: Dict[str, PCommandProcessor] = {}
-
-    def __init__(self):
-        """Build the object tree."""
-        root = find_vc_root_dir()
-        procs = []
-        procs.append(InitCommand())
-        if root is not None:
-            repo = create_repo(root)
-            procs.append(HashObjectCommand(repo))
-            procs.append(CatFileCommand(repo))
-            procs.append(AddCommand(repo))
-            procs.append(CommitCommand(repo))
-            procs.append(StatusCommand(repo))
-            procs.append(LogCommand(repo))
-            procs.append(CheckoutCommand(repo))
-            procs.append(BranchCommand(repo))
-            procs.append(DiffCommand(repo))
-
-        for p in procs:
-            self.processors[p.key] = p
-
-    @property
-    def key(self):
-        return ""
-
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
+        procs: Dict[str, PCommandProcessor] = {}
+
+        procs["hash-object"] = HashObjectCommand
+        procs["cat-file"] = CatFileCommand
+        procs["add"] = AddCommand
+        procs["commit"] = CommitCommand
+        procs["status"] = StatusCommand
+        procs["log"] = LogCommand
+        procs["checkout"] = CheckoutCommand
+        procs["branch"] = BranchCommand
+        procs["diff"] = DiffCommand
+        procs["init"] = InitCommand
+
         if len(args) < 2:
             print(
                 "Command required. Available commands:"
-                + f" {', '.join(self.processors.keys())}",
+                + f" {', '.join(procs.keys())}",
                 file=sys.stderr,
             )
             exit(-1)
 
         cmd = args[1]
 
-        if cmd not in self.processors.keys():
+        if cmd not in procs.keys():
             print(
                 f"Command '{cmd}' not implemented. Available commands:"
-                + f" {', '.join(self.processors.keys())}",
+                + f" {', '.join(procs.keys())}",
                 file=sys.stderr,
             )
             exit(-1)
 
-        self.processors[cmd].process_command((args[2:]))
+        command = procs[cmd]
+        if hasattr(command, 'no_repo_needed') and command.no_repo_needed is True:
+            command().process_command(args[2:])
+            return
+        root = find_vc_root_dir()
+        if root is None:
+            print("fatal: not a vc repository (or any of the parent directories): .vc", file=sys.stderr)
+            exit(1)
+        repo = create_repo(root)
+        command(repo).process_command(args[2:])
 
 
 def main(args: List[str]) -> None:
+    """Execute the client."""
     p = MainCommandProcessor()
     p.process_command(args)

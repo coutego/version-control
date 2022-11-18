@@ -23,10 +23,6 @@ class CommitCommand(PCommandProcessor):
         except Exception:
             parser.print_help(sys.stderr)
 
-    @property
-    def key(self):
-        return "commit"
-
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
         require_initialized_repo(self.repo)

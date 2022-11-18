@@ -27,10 +27,6 @@ class HashObjectCommand(PCommandProcessor):
         self.parser = parser
         self.repo = repo
 
-    @property
-    def key(self):
-        return "hash-object"
-
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
         require_initialized_repo(self.repo)

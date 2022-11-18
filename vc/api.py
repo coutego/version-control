@@ -286,11 +286,6 @@ class PRepo(Protocol):
 class PCommandProcessor(Protocol):
     """Protocol implemented by the (sub)commands."""
 
-    @property
-    def key(self) -> str:
-        """Return the key of this command."""
-        ...
-
     def process_command(self, args: List[str]) -> None:
         """Process the command with the given args."""
         ...
